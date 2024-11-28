@@ -47,35 +47,61 @@ def verify_login(email, password):
     global users_df
     return any((users_df["Email"] == email) & (users_df["Password"] == password))
 
-# Login/Register logic
+# Initialize session state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
+if "show_auth" not in st.session_state:
+    st.session_state.show_auth = False
 
-if not st.session_state.logged_in:
-    st.markdown("<h1 style='text-align: center;'>Login Page</h1>", unsafe_allow_html=True)
-    login_option = st.radio("Choose an option:", ["Login", "Register"])
+# Top-right corner: Login/Signup button
+st.markdown(
+    """
+    <style>
+    .top-right-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-    if login_option == "Login":
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
-        if st.button("Login"):
-            if verify_login(email, password):
-                st.success("Login successful!")
-                st.session_state.logged_in = True
-                st.session_state.user_email = email
-            else:
-                st.error("Invalid email or password.")
-    elif login_option == "Register":
-        email = st.text_input("Email (Registration)")
-        password = st.text_input("Password (Registration)", type="password")
-        if st.button("Register"):
-            if email in users_df["Email"].values:
-                st.error("This email is already registered.")
-            else:
-                add_user(email, password)
-                st.success("Registration successful! Please login.")
-else:
-    # Sidebar: User email input (Already logged in)
+login_button = st.button("Login/Signup", key="login_button", on_click=lambda: st.session_state.update({"show_auth": True}))
+
+# Main section
+st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
+
+# Show authentication popup if `show_auth` is True
+if st.session_state.show_auth:
+    with st.container():
+        st.markdown("<h3 style='text-align: center;'>Authentication</h3>", unsafe_allow_html=True)
+        auth_option = st.radio("Choose an option:", ["Login", "Register"], key="auth_option")
+
+        if auth_option == "Login":
+            email = st.text_input("Email", key="login_email")
+            password = st.text_input("Password", type="password", key="login_password")
+            if st.button("Login", key="login_submit"):
+                if verify_login(email, password):
+                    st.success("Login successful!")
+                    st.session_state.logged_in = True
+                    st.session_state.user_email = email
+                    st.session_state.show_auth = False
+                else:
+                    st.error("Invalid email or password.")
+        elif auth_option == "Register":
+            email = st.text_input("Email (Registration)", key="register_email")
+            password = st.text_input("Password (Registration)", type="password", key="register_password")
+            if st.button("Register", key="register_submit"):
+                if email in users_df["Email"].values:
+                    st.error("This email is already registered.")
+                else:
+                    add_user(email, password)
+                    st.success("Registration successful! Please login.")
+                    st.session_state.show_auth = False
+
+# Main Test Case Generator if logged in
+if st.session_state.logged_in:
     user_email = st.session_state.user_email
     st.sidebar.header("User Info")
     st.sidebar.write(f"Logged in as: **{user_email}**")
@@ -89,9 +115,6 @@ else:
     else:
         st.sidebar.info("No previous test cases found for this email.")
 
-    # Main section
-    st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
-
     # Dropdown to select input type
     test_case_type = st.selectbox(
         "Select Test Case Type:",
@@ -99,11 +122,11 @@ else:
         help="Choose the type of test case you are performing.",
     )
 
-    # # Test case details input
-    # test_case_details = st.text_area(
-    #     "Enter Test Case Details:",
-    #     help="Provide details about the test case you are performing.",
-    # )
+    # Test case details input
+    test_case_details = st.text_area(
+        "Enter Test Case Details:",
+        help="Provide details about the test case you are performing.",
+    )
 
     # File upload section
     uploaded_file = None
