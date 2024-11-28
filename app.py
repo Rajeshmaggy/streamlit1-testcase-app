@@ -47,67 +47,27 @@ def verify_login(email, password):
     global users_df
     return any((users_df["Email"] == email) & (users_df["Password"] == password))
 
-# Initialize session state
+# Check login state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-if "show_auth" not in st.session_state:
-    st.session_state.show_auth = False
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
 
-# Top-right corner: Login/Signup button
-st.markdown(
-    """
-    <style>
-    .top-right-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# Top-right Login/Signup Button
+col1, col2 = st.columns([9, 1])  # Create space for top-right button
+with col2:
+    if st.button("Login/Signup"):
+        st.session_state.show_modal = True  # Show modal when clicked
 
-login_button = st.button("Login/Signup", key="login_button", on_click=lambda: st.session_state.update({"show_auth": True}))
-
-# Main section
+# Test Case Generator Content
 st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
-# Show authentication popup if `show_auth` is True
-if st.session_state.show_auth:
-    with st.container():
-        st.markdown("<h3 style='text-align: center;'>Authentication</h3>", unsafe_allow_html=True)
-        auth_option = st.radio("Choose an option:", ["Login", "Register"], key="auth_option")
-
-        if auth_option == "Login":
-            email = st.text_input("Email", key="login_email")
-            password = st.text_input("Password", type="password", key="login_password")
-            if st.button("Login", key="login_submit"):
-                if verify_login(email, password):
-                    st.success("Login successful!")
-                    st.session_state.logged_in = True
-                    st.session_state.user_email = email
-                    st.session_state.show_auth = False
-                else:
-                    st.error("Invalid email or password.")
-        elif auth_option == "Register":
-            email = st.text_input("Email (Registration)", key="register_email")
-            password = st.text_input("Password (Registration)", type="password", key="register_password")
-            if st.button("Register", key="register_submit"):
-                if email in users_df["Email"].values:
-                    st.error("This email is already registered.")
-                else:
-                    add_user(email, password)
-                    st.success("Registration successful! Please login.")
-                    st.session_state.show_auth = False
-
-# Main Test Case Generator if logged in
 if st.session_state.logged_in:
-    user_email = st.session_state.user_email
     st.sidebar.header("User Info")
-    st.sidebar.write(f"Logged in as: **{user_email}**")
+    st.sidebar.write(f"Logged in as: **{st.session_state.user_email}**")
 
-    # Display previously submitted test cases in the sidebar
-    user_test_cases = test_cases_df[test_cases_df["Email"] == user_email]
+    # Display previously submitted test cases
+    user_test_cases = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
     if not user_test_cases.empty:
         st.sidebar.markdown("### Your Previously Submitted Test Cases:")
         for i, row in user_test_cases.iterrows():
@@ -115,48 +75,72 @@ if st.session_state.logged_in:
     else:
         st.sidebar.info("No previous test cases found for this email.")
 
-    # Dropdown to select input type
-    test_case_type = st.selectbox(
-        "Select Test Case Type:",
-        ["Video", "Screenshots", "Document"],
-        help="Choose the type of test case you are performing.",
+# Dropdown to select input type
+test_case_type = st.selectbox(
+    "Select Test Case Type:",
+    ["Video", "Screenshots", "Document"],
+    help="Choose the type of test case you are performing.",
+)
+
+test_case_details = st.text_area(
+    "Enter Test Case Details:",
+    help="Provide details about the test case you are performing.",
+)
+
+uploaded_file = None
+if test_case_type == "Video":
+    uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
+elif test_case_type == "Screenshots":
+    uploaded_file = st.file_uploader("Upload your screenshots:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+elif test_case_type == "Document":
+    uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
+
+if st.button("Submit Test Case"):
+    if not test_case_details.strip():
+        st.warning("Please provide test case details.")
+    elif not uploaded_file:
+        st.warning("Please upload a file for the selected test case type.")
+    else:
+        if isinstance(uploaded_file, list):  # For multiple screenshots
+            for file in uploaded_file:
+                save_data(st.session_state.user_email, test_case_type, test_case_details, file.name)
+            st.success(f"{len(uploaded_file)} screenshots uploaded and test case saved successfully!")
+        else:  # For single file
+            save_data(st.session_state.user_email, test_case_type, test_case_details, uploaded_file.name)
+            st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
+
+# Login/Signup Modal
+if "show_modal" in st.session_state and st.session_state.show_modal:
+    st.markdown(
+        """
+        <div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); width: 400px; background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1);">
+            <h3 style="text-align: center;">User Authentication</h3>
+        """,
+        unsafe_allow_html=True,
     )
-
-    # Test case details input
-    test_case_details = st.text_area(
-        "Enter Test Case Details:",
-        help="Provide details about the test case you are performing.",
-    )
-
-    # File upload section
-    uploaded_file = None
-    if test_case_type == "Video":
-        uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
-    elif test_case_type == "Screenshots":
-        uploaded_file = st.file_uploader("Upload your screenshots:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-    elif test_case_type == "Document":
-        uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
-
-    # Submit button
-    if st.button("Submit Test Case"):
-        if not test_case_details.strip():
-            st.warning("Please provide test case details.")
-        elif not uploaded_file:
-            st.warning("Please upload a file for the selected test case type.")
+    login_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
+    email = st.text_input("Email", key="auth_email")
+    password = st.text_input("Password", type="password", key="auth_password")
+    if login_option == "Login" and st.button("Login", key="login_button"):
+        if verify_login(email, password):
+            st.session_state.logged_in = True
+            st.session_state.user_email = email
+            st.session_state.show_modal = False
+            st.experimental_rerun()
         else:
-            # Handle multiple screenshots case
-            if isinstance(uploaded_file, list):  # For multiple files (screenshots)
-                for file in uploaded_file:
-                    save_data(user_email, test_case_type, test_case_details, file.name)
-                st.success(f"{len(uploaded_file)} screenshots uploaded and test case saved successfully!")
-            else:  # For single file (video/document)
-                save_data(user_email, test_case_type, test_case_details, uploaded_file.name)
-                st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
+            st.error("Invalid email or password.")
+    elif login_option == "Signup" and st.button("Signup", key="signup_button"):
+        if email in users_df["Email"].values:
+            st.error("This email is already registered.")
+        else:
+            add_user(email, password)
+            st.success("Signup successful! Please login.")
+            st.session_state.show_modal = False
+            st.experimental_rerun()
 
-            # Reload the user test cases
-            user_test_cases = test_cases_df[test_cases_df["Email"] == user_email]
+    # Close button
+    if st.button("Close", key="close_modal"):
+        st.session_state.show_modal = False
+        st.experimental_rerun()
 
-            # Display the updated test cases in the sidebar
-            st.sidebar.markdown("### Your Updated Test Cases:")
-            for i, row in user_test_cases.iterrows():
-                st.sidebar.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
+    st.markdown("</div>", unsafe_allow_html=True)
