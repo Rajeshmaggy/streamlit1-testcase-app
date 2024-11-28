@@ -55,32 +55,9 @@ if "show_modal" not in st.session_state:
     st.session_state.show_modal = False
 
 # Top-right corner button
-st.markdown(
-    """
-    <style>
-        .top-right-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .top-right-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 if st.session_state.logged_in:
     st.markdown(
-        f"<button class='top-right-button'>Logged in as {st.session_state.user_email}</button>",
+        f"<div style='position: absolute; top: 20px; right: 20px;'>Logged in as: {st.session_state.user_email}</div>",
         unsafe_allow_html=True,
     )
 else:
@@ -103,18 +80,16 @@ if st.session_state.show_modal:
             padding: 20px;
             box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
             z-index: 10;">
-            <h3 style="text-align: center; margin-bottom: 20px;">User Authentication</h3>
-        </div>
         """,
         unsafe_allow_html=True,
     )
 
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
-        login_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
-        email = st.text_input("Email", key="auth_email")
-        password = st.text_input("Password", type="password", key="auth_password")
+    login_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
+    email = st.text_input("Email", key="auth_email")
+    password = st.text_input("Password", type="password", key="auth_password")
 
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
         if login_option == "Login" and st.button("Login", key="login_button"):
             if verify_login(email, password):
                 st.session_state.logged_in = True
@@ -136,17 +111,7 @@ if st.session_state.show_modal:
             st.session_state.show_modal = False
             st.experimental_rerun()
 
-    # Dim the background while the modal is open
-    st.markdown(
-        """
-        <style>
-            .stApp {
-                filter: blur(2px);
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Main Test Case Generator content
 if st.session_state.logged_in:
