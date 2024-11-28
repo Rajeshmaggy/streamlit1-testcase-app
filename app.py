@@ -115,12 +115,14 @@ if "show_modal" in st.session_state and st.session_state.show_modal:
         """
         <div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -20%); width: 400px; background-color: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1);">
             <h3 style="text-align: center;">User Authentication</h3>
+            email = st.text_input("Email", key="auth_email")
+    password = st.text_input("Password", type="password", key="auth_password")
         """,
         unsafe_allow_html=True,
     )
     login_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
-    email = st.text_input("Email", key="auth_email")
-    password = st.text_input("Password", type="password", key="auth_password")
+    # email = st.text_input("Email", key="auth_email")
+    # password = st.text_input("Password", type="password", key="auth_password")
     if login_option == "Login" and st.button("Login", key="login_button"):
         if verify_login(email, password):
             st.session_state.logged_in = True
