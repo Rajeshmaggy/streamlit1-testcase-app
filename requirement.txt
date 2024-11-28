@@ -1,0 +1,4 @@
+streamlit
+pandas
+openpyxl  # Optional: If your app uses Excel files
+numpy     # Optional: If your app uses NumPy
