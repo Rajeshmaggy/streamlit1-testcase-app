@@ -99,11 +99,11 @@ else:
         help="Choose the type of test case you are performing.",
     )
 
-    # Test case details input
-    test_case_details = st.text_area(
-        "Enter Test Case Details:",
-        help="Provide details about the test case you are performing.",
-    )
+    # # Test case details input
+    # test_case_details = st.text_area(
+    #     "Enter Test Case Details:",
+    #     help="Provide details about the test case you are performing.",
+    # )
 
     # File upload section
     uploaded_file = None
