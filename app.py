@@ -101,13 +101,15 @@ else:
     # Extract first letter of email for profile picture
     profile_initial = st.session_state.user_email[0].upper()
 
-    # Profile Display in a Circular Badge
-    st.markdown(
+    # Profile Display in a Circular Badge (with click event)
+    profile_info_displayed = st.session_state.get('profile_info_displayed', False)
+
+    profile_button = st.markdown(
         f"""
         <style>
             .profile-badge {{
                 position: fixed;
-                top: 70px;
+                top: 20px;
                 right: 20px;
                 width: 40px;
                 height: 40px;
@@ -118,12 +120,23 @@ else:
                 font-size: 20px;
                 font-weight: bold;
                 line-height: 40px;
+                cursor: pointer;
             }}
         </style>
-        <div class="profile-badge">{profile_initial}</div>
+        <div class="profile-badge" onclick="window.open('', '_self').close()">{profile_initial}</div>
         """,
         unsafe_allow_html=True
     )
+
+    # If profile badge is clicked, toggle info visibility
+    if profile_button:
+        st.session_state['profile_info_displayed'] = not profile_info_displayed
+
+    if profile_info_displayed:
+        # Show user info in a popup-like style
+        st.markdown(f"### User Info: {st.session_state.user_email}")
+        st.markdown(f"Test cases submitted: {len(test_cases_df[test_cases_df['Email'] == st.session_state.user_email])}")
+        st.markdown(f"Email: {st.session_state.user_email}")
 
     # Dropdown to select input type
     test_case_type = st.selectbox(
