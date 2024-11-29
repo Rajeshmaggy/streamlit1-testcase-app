@@ -147,41 +147,43 @@ else:
         st.sidebar.write(f"**Email:** {st.session_state.user_email}")
         # You can add more info such as user history or additional profile details here
 
-    # Test Case Type Selection dropdown (in a single line using columns)
-    col1, col2 = st.columns([1, 1])
+    # Align input fields and file upload in the same line using columns
+    col1, col2, col3 = st.columns([1, 1, 2])
 
     with col1:
-        # First Dropdown: Test Case Type
+        # Dropdown for Test Case Type
         test_case_type = st.selectbox(
-            "Select Test Case Type:",
+            "Test Case Type",
             ["Test Case Generation", "Test Case Validation", "Context Modeling"],
-            help="Choose the type of test case you are working on.",
+            help="Choose the type of test case you are working on."
         )
 
     with col2:
-        # Second Dropdown: Content Type (based on Test Case Type)
+        # Dropdown for Content Type based on Test Case Type
+        content_type = None
         if test_case_type == "Test Case Generation":
             content_type = st.selectbox(
-                "Select Content Type for Test Case:",
+                "Content Type",
                 ["Photo", "Video", "Document"],
                 help="Choose the type of content related to this test case."
             )
 
-    # File upload based on Content Type
-    uploaded_file = None
-    if content_type == "Video":
-        uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
-    elif content_type == "Photo":
-        uploaded_file = st.file_uploader("Upload your photo file:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-    elif content_type == "Document":
-        uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
+    with col3:
+        # File upload based on content type
+        uploaded_file = None
+        if content_type == "Photo":
+            uploaded_file = st.file_uploader("Upload Photo", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+        elif content_type == "Video":
+            uploaded_file = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"])
+        elif content_type == "Document":
+            uploaded_file = st.file_uploader("Upload Document", type=["pdf", "docx", "txt"])
 
-    # Submit button
+    # Submit button for saving the test case
     if st.button("Submit Test Case"):
         if 'user_email' not in st.session_state:
             st.warning("Please log in to submit a test case.")
         elif not uploaded_file:
-            st.warning("Please upload a file for the selected test case type.")
+            st.warning("Please upload a file for the selected content type.")
         else:
             # Handle multiple photos case
             if isinstance(uploaded_file, list):  # For multiple files (photos)
