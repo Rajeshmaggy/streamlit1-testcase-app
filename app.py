@@ -104,12 +104,13 @@ else:
     # Profile Display in a Circular Badge (with click event)
     profile_info_displayed = st.session_state.get('profile_info_displayed', False)
 
-    profile_button = st.markdown(
+    # Create profile icon
+    profile_icon = st.markdown(
         f"""
         <style>
             .profile-badge {{
                 position: fixed;
-                top: 60px;
+                top: 20px;
                 right: 20px;
                 width: 40px;
                 height: 40px;
@@ -128,15 +129,16 @@ else:
         unsafe_allow_html=True
     )
 
-    # If profile badge is clicked, toggle info visibility
-    if profile_button:
+    # Check if the profile icon was clicked
+    if profile_icon:
         st.session_state['profile_info_displayed'] = not profile_info_displayed
 
-    if profile_info_displayed:
-        # Show user info in a popup-like style
-        st.markdown(f"### User Info: {st.session_state.user_email}")
-        st.markdown(f"Test cases submitted: {len(test_cases_df[test_cases_df['Email'] == st.session_state.user_email])}")
-        st.markdown(f"Email: {st.session_state.user_email}")
+    # When profile badge is clicked, show user info in the sidebar
+    if 'profile_info_displayed' in st.session_state and st.session_state.profile_info_displayed:
+        # Show user info in the sidebar
+        st.sidebar.markdown(f"### User Info: {st.session_state.user_email}")
+        st.sidebar.markdown(f"Test cases submitted: {len(test_cases_df[test_cases_df['Email'] == st.session_state.user_email])}")
+        st.sidebar.markdown(f"Email: {st.session_state.user_email}")
 
     # Dropdown to select input type
     test_case_type = st.selectbox(
