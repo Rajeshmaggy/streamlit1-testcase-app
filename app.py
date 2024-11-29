@@ -112,27 +112,10 @@ else:
         st.sidebar.write(f"**Email:** {st.session_state.user_email}")
         # You can add more info such as user history or additional profile details here
 
-    # Inject custom CSS to make the dropdowns appear in one line
-    st.markdown(
-        """
-        <style>
-            .dropdown-container {
-                display: flex;
-                justify-content: space-between;
-                gap: 20px;
-            }
-            .dropdown-container select {
-                width: 30%;  /* Adjust the width percentage as necessary */
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    # Test Case Type Selection dropdown (in a single line using columns)
+    col1, col2 = st.columns([1, 1])
 
-    # Test Case Type Selection dropdown (in a single line)
-    with st.container():
-        st.markdown('<div class="dropdown-container">', unsafe_allow_html=True)
-        
+    with col1:
         # First Dropdown: Test Case Type
         test_case_type = st.selectbox(
             "Select Test Case Type:",
@@ -140,6 +123,7 @@ else:
             help="Choose the type of test case you are working on.",
         )
 
+    with col2:
         # Second Dropdown: Content Type (based on Test Case Type)
         if test_case_type == "Test Case Generation":
             content_type = st.selectbox(
@@ -147,8 +131,6 @@ else:
                 ["Photo", "Video", "Document"],
                 help="Choose the type of content related to this test case."
             )
-        
-        st.markdown('</div>', unsafe_allow_html=True)
 
     # File upload based on Content Type
     uploaded_file = None
