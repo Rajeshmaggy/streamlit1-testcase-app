@@ -24,9 +24,7 @@ else:
 # Function to save user credentials
 def save_user_credentials(email, password):
     global user_credentials_df
-    new_entry = pd.DataFrame(
-        {"Email": [email], "Password": [password]}
-    )
+    new_entry = pd.DataFrame({"Email": [email], "Password": [password]})
     user_credentials_df = pd.concat([user_credentials_df, new_entry], ignore_index=True)
     user_credentials_df.to_csv(USER_CREDENTIALS_FILE, index=False)
 
@@ -41,55 +39,25 @@ def check_credentials(email, password):
 def save_data(email, test_case_type, file_name):
     global test_cases_df
     new_entry = pd.DataFrame(
-        {
-            "Email": [email],
-            "Test Case Type": [test_case_type],
-            "File Name": [file_name],
-        }
+        {"Email": [email], "Test Case Type": [test_case_type], "File Name": [file_name]}
     )
     test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
     test_cases_df.to_csv(DATA_FILE, index=False)
 
-# Custom CSS to move elements further up
+# Custom CSS to style the file uploader and align elements
 st.markdown("""
     <style>
     .stFileUploader > div {
-            height: 30px !important; /* Adjust height as needed */
-            padding: 5px !important; /* Adjust padding for better alignment */
-        }
-        .stFileUploader > div > label {
-            font-size: 8px !important; /* Optional: Adjust label font size */
-        }
-        /* Remove padding at the top */
-        .css-1d391kg {
-            padding-top: 0rem !important;
-        }
-        .css-ffhzg2 {
-            padding-top: 0rem !important;
-        }
-        .css-1v3fvcr {
-            padding-top: 0rem !important;
-        }
-        .stButton>button {
-            margin-top: 0rem !important;
-        }
-        .stTextInput>div>input {
-            margin-top: 0rem !important;
-        }
-        .stRadio>div>label {
-            margin-top: 0rem !important;
-        }
-        .stSelectbox>div>label {
-            margin-top: 0rem !important;
-        }
-        /* Reduce margin for all elements */
-        .stApp {
-            margin-top: 0px !important;
-        }
-        /* Remove default spacing between elements */
-        .css-1v3fvcr {
-            margin-top: 0px !important;
-        }
+        height: 30px !important; /* Adjust height */
+        padding: 5px !important; /* Adjust padding */
+    }
+    .stFileUploader > div > label {
+        font-size: 12px !important; /* Adjust label font size */
+    }
+    /* General spacing adjustments */
+    .stApp {
+        margin-top: 0px !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -142,17 +110,12 @@ else:
 
     # Profile icon (circle with initial)
     user_initial = st.session_state.user_email[0].upper()
-    profile_icon = st.markdown(
-        f'<div style=" position: absolute;top: 10px; right: 20px;display: flex;justify-content: flex-end;align-items: center;z-index: 1000;">'
+    st.markdown(
+        f'<div style="position: absolute; top: 10px; right: 20px; display: flex; justify-content: flex-end; align-items: center; z-index: 1000;">'
         f'<div style="border-radius: 50%; background-color: #4CAF50; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="alert(\'Profile Info\')">{user_initial}</div>'
         '</div>',
         unsafe_allow_html=True
     )
-
-    # Sidebar for profile info
-    if st.sidebar.button("Show Profile Info"):
-        st.sidebar.write(f"**Email:** {st.session_state.user_email}")
-        # You can add more info such as user history or additional profile details here
 
     # Align input fields and file upload in the same line using columns
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -200,11 +163,3 @@ else:
             else:  # For single file (video/document)
                 save_data(st.session_state.user_email, test_case_type, uploaded_file.name)
                 st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
-
-            # Reload the user test cases
-            user_test_cases = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
-
-            # Display the updated test cases in the sidebar
-            st.sidebar.markdown("### Your Updated Test Cases:")
-            for i, row in user_test_cases.iterrows():
-                st.sidebar.write(f"- **Type**: {row['Test Case Type']}, **File**: {row['File Name']}")
