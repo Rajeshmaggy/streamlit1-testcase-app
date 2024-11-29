@@ -107,7 +107,7 @@ else:
         <style>
             .profile-badge {{
                 position: fixed;
-                top: 20px;
+                top: 70px;
                 right: 20px;
                 width: 40px;
                 height: 40px;
