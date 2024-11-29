@@ -196,7 +196,7 @@ else:
         """, unsafe_allow_html=True)
 
     # Test case form and file uploads
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3 = st.columns([1, 1, 2])
 
     with col1:
         test_case_type = st.selectbox(
@@ -211,4 +211,27 @@ else:
                 "Content Type", ["Photo", "Video", "Document"]
             )
 
-    display_sidebar()
+    with col3:
+        uploaded_file = None
+        if content_type == "Photo":
+            uploaded_file = st.file_uploader("Upload Photo", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+        elif content_type == "Video":
+            uploaded_file = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"])
+        elif content_type == "Document":
+            uploaded_file = st.file_uploader("Upload Document", type=["pdf", "docx", "txt"])
+
+    # Submit button for saving the test case
+    if st.button("Submit Test Case"):
+        if 'user_email' not in st.session_state:
+            st.warning("Please log in to submit a test case.")
+        elif not uploaded_file:
+            st.warning("Please upload a file for the selected content type.")
+        else:
+            # Handle multiple photos case
+            if isinstance(uploaded_file, list):  # For multiple files (photos)
+                for file in uploaded_file:
+                    save_data(st.session_state.user_email, test_case_type, file.name)
+                st.success(f"{len(uploaded_file)} photos uploaded and test case saved successfully!")
+            else:  # For single file (video/document)
+                save_data(st.session_state.user_email, test_case_type, uploaded_file.name)
+                st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
