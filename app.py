@@ -37,55 +37,50 @@ def check_credentials(email, password):
         return True
     return False
 
-# Sidebar: User Login/Signup and Intro Content
-st.sidebar.header("Login / Signup")
-
-login_or_signup = st.sidebar.radio("Choose action:", ["Login", "Sign Up"])
-
-if login_or_signup == "Login":
-    st.sidebar.markdown("### Welcome to the Test Case Generator")
-    st.sidebar.markdown(
+# Main section content
+if 'login_successful' not in st.session_state or not st.session_state.login_successful:
+    # Login / Signup page content
+    st.markdown("<h1 style='text-align: center;'>Welcome to the Test Case Generator</h1>", unsafe_allow_html=True)
+    st.markdown(
         """
-        **Test Case Generator** allows you to create and manage test cases for your projects. 
-        You can upload files such as videos, screenshots, and documents, and associate them with detailed test case descriptions.
+        The **Test Case Generator** allows you to create and manage test cases for your projects. 
+        You can upload files such as **videos, screenshots**, and **documents** and associate them with detailed test case descriptions.
         
-        Please log in using your email and password.
+        To get started, please either log in or sign up if you don't have an account yet.
         """
     )
-    user_email = st.sidebar.text_input("Email")
-    user_password = st.sidebar.text_input("Password", type="password")
-    login_button = st.sidebar.button("Login")
 
-    if login_button:
-        if check_credentials(user_email, user_password):
-            st.session_state.login_successful = True  # Set login success state
-            st.sidebar.success("Login successful!")
-        else:
-            st.sidebar.error("Invalid credentials. Please try again.")
+    login_or_signup = st.radio("Choose action:", ["Login", "Sign Up"], index=0)
 
-elif login_or_signup == "Sign Up":
-    st.sidebar.markdown("### Sign up for the Test Case Generator")
-    st.sidebar.markdown(
-        """
-        If you don't have an account, you can sign up here. Once signed up, you can log in to start generating test cases.
-        """
-    )
-    new_user_email = st.sidebar.text_input("Email")
-    new_user_password = st.sidebar.text_input("Password", type="password")
-    confirm_password = st.sidebar.text_input("Confirm Password", type="password")
-    signup_button = st.sidebar.button("Sign Up")
+    if login_or_signup == "Login":
+        user_email = st.text_input("Email")
+        user_password = st.text_input("Password", type="password")
+        login_button = st.button("Login")
 
-    if signup_button:
-        if new_user_password != confirm_password:
-            st.sidebar.error("Passwords do not match. Please try again.")
-        elif new_user_email in user_credentials_df["Email"].values:
-            st.sidebar.error("Email already exists. Please log in.")
-        else:
-            save_user_credentials(new_user_email, new_user_password)
-            st.sidebar.success("Signup successful! You can now log in.")
+        if login_button:
+            if check_credentials(user_email, user_password):
+                st.session_state.login_successful = True  # Set login success state
+                st.success("Login successful!")
+            else:
+                st.error("Invalid credentials. Please try again.")
 
-# Main section - Test Case Generator (Only visible after login)
-if 'login_successful' in st.session_state and st.session_state.login_successful:
+    elif login_or_signup == "Sign Up":
+        new_user_email = st.text_input("Email")
+        new_user_password = st.text_input("Password", type="password")
+        confirm_password = st.text_input("Confirm Password", type="password")
+        signup_button = st.button("Sign Up")
+
+        if signup_button:
+            if new_user_password != confirm_password:
+                st.error("Passwords do not match. Please try again.")
+            elif new_user_email in user_credentials_df["Email"].values:
+                st.error("Email already exists. Please log in.")
+            else:
+                save_user_credentials(new_user_email, new_user_password)
+                st.success("Signup successful! You can now log in.")
+
+else:
+    # Main section - Test Case Generator (Only visible after login)
     st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
     # Dropdown to select input type
@@ -132,8 +127,6 @@ if 'login_successful' in st.session_state and st.session_state.login_successful:
             user_test_cases = test_cases_df[test_cases_df["Email"] == user_email]
 
             # Display the updated test cases in the sidebar
-            st.sidebar.markdown("### Your Updated Test Cases:")
+            st.markdown("### Your Updated Test Cases:")
             for i, row in user_test_cases.iterrows():
-                st.sidebar.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
-else:
-    st.sidebar.warning("Please log in to use the Test Case Generator.")
+                st.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
