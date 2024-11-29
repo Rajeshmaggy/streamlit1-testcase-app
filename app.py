@@ -35,70 +35,54 @@ if "user_email" not in st.session_state:
     st.session_state.user_email = ""
 
 # Header with login/signup button
-st.markdown(
-    """
-    <style>
-        .top-right-button {
-            position: fixed;
-            top: 60px;
-            right: 20px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
-            font-size: 14px;
-            cursor: pointer;
-            z-index: 100;
-        }
-        .top-right-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 if not st.session_state.logged_in:
-    st.markdown(
-        f"<button class='top-right-button' onclick='toggleModal()'>Login / Signup</button>",
-        unsafe_allow_html=True,
-    )
+    if st.button("Login / Signup", key="login_button"):
+        st.session_state.show_modal = True
 else:
-    st.markdown(
-        f"<button class='top-right-button'>Logged in as {st.session_state.user_email}</button>",
-        unsafe_allow_html=True,
-    )
+    st.button(f"Logged in as {st.session_state.user_email}", disabled=True)
 
 # Modal for login/signup
 if st.session_state.show_modal:
+    # Add a modal effect
     st.markdown(
         """
-        <div style="
+        <style>
+        .modal-overlay {
             position: fixed;
-            top: 20%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: fixed;
+            top: 50%;
             left: 50%;
-            transform: translate(-50%, -20%);
+            transform: translate(-50%, -50%);
             width: 400px;
             background-color: white;
-            border: 1px solid #ddd;
             border-radius: 8px;
             padding: 20px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            z-index: 1000;">
-            <h3 style="text-align: center; margin-bottom: 20px;">User Authentication</h3>
+            z-index: 1100;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
+        }
+        </style>
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
         """,
         unsafe_allow_html=True,
     )
 
-    # Content inside the modal
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
-        auth_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
-        email = st.text_input("Email", key="auth_email")
-        password = st.text_input("Password", type="password", key="auth_password")
+    # Login/Signup modal content
+    st.write("### User Authentication")
+    auth_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
+    email = st.text_input("Email", key="auth_email")
+    password = st.text_input("Password", type="password", key="auth_password")
 
-        if auth_option == "Login" and st.button("Login"):
+    if auth_option == "Login":
+        if st.button("Login"):
             if verify_login(email, password):
                 st.session_state.logged_in = True
                 st.session_state.user_email = email
@@ -106,7 +90,8 @@ if st.session_state.show_modal:
                 st.experimental_rerun()
             else:
                 st.error("Invalid email or password.")
-        elif auth_option == "Signup" and st.button("Signup"):
+    elif auth_option == "Signup":
+        if st.button("Signup"):
             if email in users_df["Email"].values:
                 st.error("This email is already registered.")
             else:
@@ -115,9 +100,9 @@ if st.session_state.show_modal:
                 st.session_state.show_modal = False
                 st.experimental_rerun()
 
-        if st.button("Close"):
-            st.session_state.show_modal = False
-            st.experimental_rerun()
+    # Close button
+    if st.button("Close"):
+        st.session_state.show_modal = False
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -127,20 +112,3 @@ if not st.session_state.logged_in:
 else:
     st.success(f"Welcome {st.session_state.user_email}! You are logged in.")
     st.text_area("Test Case Generator:", "Enter your test case details here...")
-
-# JavaScript to toggle modal visibility
-st.markdown(
-    """
-    <script>
-        function toggleModal() {
-            const modalVisible = %s;
-            if (modalVisible) {
-                document.querySelector('.stApp').style.filter = 'blur(0px)';
-            } else {
-                document.querySelector('.stApp').style.filter = 'blur(4px)';
-            }
-        }
-    </script>
-    """ % str(st.session_state.show_modal).lower(),
-    unsafe_allow_html=True,
-)
