@@ -37,13 +37,21 @@ def check_credentials(email, password):
         return True
     return False
 
-# Sidebar: User Login/Signup
+# Sidebar: User Login/Signup and Intro Content
 st.sidebar.header("Login / Signup")
 
 login_or_signup = st.sidebar.radio("Choose action:", ["Login", "Sign Up"])
 
-# Login/Signup form
 if login_or_signup == "Login":
+    st.sidebar.markdown("### Welcome to the Test Case Generator")
+    st.sidebar.markdown(
+        """
+        **Test Case Generator** allows you to create and manage test cases for your projects. 
+        You can upload files such as videos, screenshots, and documents, and associate them with detailed test case descriptions.
+        
+        Please log in using your email and password.
+        """
+    )
     user_email = st.sidebar.text_input("Email")
     user_password = st.sidebar.text_input("Password", type="password")
     login_button = st.sidebar.button("Login")
@@ -56,6 +64,12 @@ if login_or_signup == "Login":
             st.sidebar.error("Invalid credentials. Please try again.")
 
 elif login_or_signup == "Sign Up":
+    st.sidebar.markdown("### Sign up for the Test Case Generator")
+    st.sidebar.markdown(
+        """
+        If you don't have an account, you can sign up here. Once signed up, you can log in to start generating test cases.
+        """
+    )
     new_user_email = st.sidebar.text_input("Email")
     new_user_password = st.sidebar.text_input("Password", type="password")
     confirm_password = st.sidebar.text_input("Confirm Password", type="password")
