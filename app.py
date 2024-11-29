@@ -98,8 +98,32 @@ else:
     # Main section - Test Case Generator (Only visible after login)
     st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
-    # Display user profile in the top-right corner
-    st.markdown(f"<p style='text-align: right;'>Logged in as: <strong>{st.session_state.user_email}</strong></p>", unsafe_allow_html=True)
+    # Extract first letter of email for profile picture
+    profile_initial = st.session_state.user_email[0].upper()
+
+    # Profile Display in a Circular Badge
+    st.markdown(
+        f"""
+        <style>
+            .profile-badge {{
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                width: 40px;
+                height: 40px;
+                background-color: #4CAF50;
+                color: white;
+                border-radius: 50%;
+                text-align: center;
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 40px;
+            }}
+        </style>
+        <div class="profile-badge">{profile_initial}</div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Dropdown to select input type
     test_case_type = st.selectbox(
