@@ -60,6 +60,7 @@ if 'login_successful' not in st.session_state or not st.session_state.login_succ
         if login_button:
             if check_credentials(user_email, user_password):
                 st.session_state.login_successful = True  # Set login success state
+                st.session_state.user_email = user_email  # Store email in session state
                 st.success("Login successful!")
             else:
                 st.error("Invalid credentials. Please try again.")
@@ -107,8 +108,8 @@ else:
 
     # Submit button
     if st.button("Submit Test Case"):
-        if not user_email:
-            st.warning("Please enter your email address before submitting.")
+        if 'user_email' not in st.session_state:
+            st.warning("Please log in to submit a test case.")
         elif not test_case_details.strip():
             st.warning("Please provide test case details.")
         elif not uploaded_file:
@@ -117,14 +118,14 @@ else:
             # Handle multiple screenshots case
             if isinstance(uploaded_file, list):  # For multiple files (screenshots)
                 for file in uploaded_file:
-                    save_data(user_email, test_case_type, test_case_details, file.name)
+                    save_data(st.session_state.user_email, test_case_type, test_case_details, file.name)
                 st.success(f"{len(uploaded_file)} screenshots uploaded and test case saved successfully!")
             else:  # For single file (video/document)
-                save_data(user_email, test_case_type, test_case_details, uploaded_file.name)
+                save_data(st.session_state.user_email, test_case_type, test_case_details, uploaded_file.name)
                 st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
 
             # Reload the user test cases
-            user_test_cases = test_cases_df[test_cases_df["Email"] == user_email]
+            user_test_cases = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
 
             # Display the updated test cases in the sidebar
             st.markdown("### Your Updated Test Cases:")
