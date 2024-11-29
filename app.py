@@ -14,6 +14,8 @@ if 'login_successful' not in st.session_state:
     st.session_state.login_successful = False
 if 'user_email' not in st.session_state:
     st.session_state.user_email = ""
+if 'show_profile_info' not in st.session_state:
+    st.session_state.show_profile_info = False
 
 # Ensure data files exist
 if not os.path.exists(DATA_FILE):
@@ -113,11 +115,16 @@ if not st.session_state.login_successful:
 else:
     st.title("Test Case Generator")
 
-    # Profile Icon and Info
+    # Profile Icon and Info Toggle
     user_initial = st.session_state.user_email[0].upper()
+
+    # Display profile icon and toggle button
+    if st.button("Show Profile Info", key="show_profile_button"):
+        st.session_state.show_profile_info = not st.session_state.show_profile_info
+
     st.markdown(
         f"""
-        <div style="position: fixed; top: 65px; right: 10px; z-index: 1000;">
+        <div style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
             <div style="display: flex; align-items: center; cursor: pointer;">
                 <div style="border-radius: 50%; background-color: #4CAF50; color: white; 
                     width: 40px; height: 40px; display: flex; align-items: center; 
@@ -130,13 +137,6 @@ else:
         """,
         unsafe_allow_html=True
     )
-
-    # Profile Info Toggle Button
-    if "show_profile_info" not in st.session_state:
-        st.session_state.show_profile_info = False
-
-    if st.button("Show Profile Info"):
-        st.session_state.show_profile_info = not st.session_state.show_profile_info
 
     if st.session_state.show_profile_info:
         st.markdown(f"""
