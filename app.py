@@ -98,6 +98,9 @@ else:
     # Main section - Test Case Generator (Only visible after login)
     st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
+    # Display user profile in the top-right corner
+    st.markdown(f"<p style='text-align: right;'>Logged in as: <strong>{st.session_state.user_email}</strong></p>", unsafe_allow_html=True)
+
     # Dropdown to select input type
     test_case_type = st.selectbox(
         "Select Test Case Type:",
@@ -142,6 +145,6 @@ else:
             user_test_cases = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
 
             # Display the updated test cases in the sidebar
-            st.markdown("### Your Updated Test Cases:")
+            st.sidebar.markdown("### Your Updated Test Cases:")
             for i, row in user_test_cases.iterrows():
-                st.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
+                st.sidebar.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
