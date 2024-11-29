@@ -50,9 +50,10 @@ def save_data(email, test_case_type, file_name):
     test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
     test_cases_df.to_csv(DATA_FILE, index=False)
 
-# Custom CSS to move elements up
+# Custom CSS to move elements further up
 st.markdown("""
     <style>
+        /* Remove padding at the top */
         .css-1d391kg {
             padding-top: 0rem !important;
         }
@@ -73,6 +74,14 @@ st.markdown("""
         }
         .stSelectbox>div>label {
             margin-top: 0rem !important;
+        }
+        /* Reduce margin for all elements */
+        .stApp {
+            margin-top: 0px !important;
+        }
+        /* Remove default spacing between elements */
+        .css-1v3fvcr {
+            margin-top: 0px !important;
         }
     </style>
 """, unsafe_allow_html=True)
