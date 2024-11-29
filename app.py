@@ -55,27 +55,37 @@ def save_data(email, test_case_type, file_name):
     test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
     test_cases_df.to_csv(DATA_FILE, index=False)
 
-# Sidebar for user history
-if st.session_state.login_successful:
-    user_history = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
-
+# Sidebar for user history and upload section
+def display_sidebar():
     with st.sidebar:
-        st.markdown("### User History")
-        if user_history.empty:
-            st.info("No test cases submitted yet.")
-        else:
-            filter_type = st.selectbox(
-                "Filter by Test Case Type:",
-                ["All"] + user_history["Test Case Type"].unique().tolist()
-            )
-            if filter_type != "All":
-                filtered_history = user_history[user_history["Test Case Type"] == filter_type]
+        st.markdown("### Upload and History")
+
+        # Show file upload section
+        uploaded_file = None
+        if test_case_type == "Test Case Generation":
+            uploaded_file = st.file_uploader("Upload Photo", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+        elif test_case_type == "Test Case Validation":
+            uploaded_file = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"])
+        elif test_case_type == "Context Modeling":
+            uploaded_file = st.file_uploader("Upload Document", type=["pdf", "docx", "txt"])
+
+        if uploaded_file:
+            if isinstance(uploaded_file, list):
+                for file in uploaded_file:
+                    save_data(st.session_state.user_email, test_case_type, file.name)
+                st.success(f"{len(uploaded_file)} files uploaded successfully!")
             else:
-                filtered_history = user_history
-            st.dataframe(
-                filtered_history[["Test Case Type", "File Name"]].reset_index(drop=True),
-                use_container_width=True
-            )
+                save_data(st.session_state.user_email, test_case_type, uploaded_file.name)
+                st.success(f"File '{uploaded_file.name}' uploaded successfully!")
+
+        # Show user history section (in text format)
+        st.markdown("### Your Test Cases")
+        user_history = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
+        if user_history.empty:
+            st.write("No test cases submitted yet.")
+        else:
+            for index, row in user_history.iterrows():
+                st.write(f"Test Case Type: {row['Test Case Type']} - File: {row['File Name']}")
 
 # Login or Signup Page
 if not st.session_state.login_successful:
@@ -142,11 +152,6 @@ else:
                 font-weight: bold;
                 cursor: pointer;
             }
-            .profile-button {
-                margin-left: 10px;
-                font-size: 12px;
-                cursor: pointer;
-            }
         </style>
     """, unsafe_allow_html=True)
 
@@ -156,9 +161,6 @@ else:
             <div class="profile-icon" onclick="toggleProfileInfo()">
                 {user_initial}
             </div>
-            <button class="profile-button" onclick="toggleProfileInfo()">
-                Show Profile Info
-            </button>
         </div>
         <script>
             function toggleProfileInfo() {{
@@ -200,23 +202,4 @@ else:
                 "Content Type", ["Photo", "Video", "Document"]
             )
 
-    with col3:
-        uploaded_file = None
-        if content_type == "Photo":
-            uploaded_file = st.file_uploader("Upload Photo", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-        elif content_type == "Video":
-            uploaded_file = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"])
-        elif content_type == "Document":
-            uploaded_file = st.file_uploader("Upload Document", type=["pdf", "docx", "txt"])
-
-    if st.button("Submit Test Case"):
-        if not uploaded_file:
-            st.warning("Please upload a file for the selected content type.")
-        else:
-            if isinstance(uploaded_file, list):
-                for file in uploaded_file:
-                    save_data(st.session_state.user_email, test_case_type, file.name)
-                st.success(f"{len(uploaded_file)} files uploaded successfully!")
-            else:
-                save_data(st.session_state.user_email, test_case_type, uploaded_file.name)
-                st.success(f"File '{uploaded_file.name}' uploaded successfully!")
+    display_sidebar()
