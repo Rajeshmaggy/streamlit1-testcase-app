@@ -94,7 +94,7 @@ else:
 button_html = """
 <div style="
     position: fixed;
-    top: 20px;
+    top: 60px;
     right: 20px;
     z-index: 1000;">
     <button onclick="window.dispatchEvent(new Event('modal_open'))"
