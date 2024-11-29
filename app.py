@@ -53,6 +53,13 @@ def save_data(email, test_case_type, file_name):
 # Custom CSS to move elements further up
 st.markdown("""
     <style>
+    .stFileUploader > div {
+            height: 50px !important; /* Adjust height as needed */
+            padding: 5px !important; /* Adjust padding for better alignment */
+        }
+        .stFileUploader > div > label {
+            font-size: 12px !important; /* Optional: Adjust label font size */
+        }
         /* Remove padding at the top */
         .css-1d391kg {
             padding-top: 0rem !important;
