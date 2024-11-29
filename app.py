@@ -50,6 +50,33 @@ def save_data(email, test_case_type, file_name):
     test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
     test_cases_df.to_csv(DATA_FILE, index=False)
 
+# Custom CSS to move elements up
+st.markdown("""
+    <style>
+        .css-1d391kg {
+            padding-top: 0rem !important;
+        }
+        .css-ffhzg2 {
+            padding-top: 0rem !important;
+        }
+        .css-1v3fvcr {
+            padding-top: 0rem !important;
+        }
+        .stButton>button {
+            margin-top: 0rem !important;
+        }
+        .stTextInput>div>input {
+            margin-top: 0rem !important;
+        }
+        .stRadio>div>label {
+            margin-top: 0rem !important;
+        }
+        .stSelectbox>div>label {
+            margin-top: 0rem !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Main section content
 if 'login_successful' not in st.session_state or not st.session_state.login_successful:
     # Login / Signup page content
@@ -97,7 +124,7 @@ else:
     # Main section - Test Case Generator (Only visible after login)
     st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
-    # Profile icon
+    # Profile icon (circle with initial)
     user_initial = st.session_state.user_email[0].upper()
     profile_icon = st.markdown(
         f'<div style="display: flex; justify-content: flex-end; align-items: center;">'
