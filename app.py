@@ -21,15 +21,7 @@ if os.path.exists(USERS_FILE):
 else:
     users_df = pd.DataFrame(columns=["Email", "Password"])
 
-# Initialize session states
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "user_email" not in st.session_state:
-    st.session_state.user_email = ""
-if "show_modal" not in st.session_state:
-    st.session_state.show_modal = False
-
-# Function to add user
+# Functions
 def add_user(email, password):
     """Add a new user."""
     global users_df
@@ -37,42 +29,43 @@ def add_user(email, password):
     users_df = pd.concat([users_df, new_user], ignore_index=True)
     users_df.to_csv(USERS_FILE, index=False)
 
-# Function to verify login
 def verify_login(email, password):
     """Verify user login credentials."""
     global users_df
     return any((users_df["Email"] == email) & (users_df["Password"] == password))
 
-# Top-right corner login/signup button
-button_html = """
-<div style="
-    position: fixed;
-    top: 60px;
-    right: 20px;
-    z-index: 1000;">
-    <button onclick="window.dispatchEvent(new Event('modal_open'))"
-            style="
-                background-color: #007BFF;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 10px 15px;
-                cursor: pointer;
-                font-size: 14px;">
-        Login / Signup
-    </button>
-</div>
-"""
-st.markdown(button_html, unsafe_allow_html=True)
+# Initialize session state variables
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user_email" not in st.session_state:
+    st.session_state.user_email = ""
+if "show_modal" not in st.session_state:
+    st.session_state.show_modal = False
 
-# Handle modal visibility
-if st.button("Open Login Modal"):
-    st.session_state.show_modal = True
+# CSS for styling the modal and button
+st.markdown(
+    """
+    <style>
+        /* Style for the top-right Login/Signup button */
+        .login-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .login-button:hover {
+            background-color: #0056b3;
+        }
 
-if st.session_state.show_modal:
-    st.markdown(
-        """
-        <div style="
+        /* Style for the modal popup */
+        .modal {
             position: fixed;
             top: 20%;
             left: 50%;
@@ -83,8 +76,49 @@ if st.session_state.show_modal:
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-            z-index: 10;">
+            z-index: 1001;
+        }
+
+        /* Background dimming effect when modal is open */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Top-right corner Login/Signup button
+st.markdown(
+    f"""
+    <button class="login-button" onclick="window.dispatchEvent(new Event('open_modal'))">
+        Login / Signup
+    </button>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Handle modal display
+if st.button("Open Login Modal"):
+    st.session_state.show_modal = True
+
+# Show the modal if triggered
+if st.session_state.show_modal:
+    # Overlay for dimmed background
+    st.markdown('<div class="overlay"></div>', unsafe_allow_html=True)
+
+    # Modal content
+    st.markdown(
+        """
+        <div class="modal">
             <h3 style="text-align: center;">User Authentication</h3>
+            <hr>
         </div>
         """,
         unsafe_allow_html=True,
