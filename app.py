@@ -50,6 +50,7 @@ if login_or_signup == "Login":
 
     if login_button:
         if check_credentials(user_email, user_password):
+            st.session_state.login_successful = True  # Set login success state
             st.sidebar.success("Login successful!")
         else:
             st.sidebar.error("Invalid credentials. Please try again.")
