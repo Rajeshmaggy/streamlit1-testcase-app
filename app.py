@@ -85,7 +85,7 @@ def display_sidebar():
             st.write("No test cases submitted yet.")
         else:
             for index, row in user_history.iterrows():
-                st.write(f"Test Case Type: {row['Test Case Type']} - File: {row['File Name']}")
+                st.write(f"- **Test Case Type**: {row['Test Case Type']} | **File**: {row['File Name']}")
 
 # Login or Signup Page
 if not st.session_state.login_successful:
@@ -152,6 +152,18 @@ else:
                 font-weight: bold;
                 cursor: pointer;
             }
+            #profile-info {
+                position: fixed;
+                top: 60px;
+                right: 10px;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                padding: 15px;
+                width: 300px;
+                z-index: 1000;
+                text-align: right;
+                display: none;
+            }
         </style>
     """, unsafe_allow_html=True)
 
@@ -167,10 +179,8 @@ else:
                 var profileDiv = document.getElementById('profile-info');
                 if (profileDiv.style.display === "none" || !profileDiv.style.display) {{
                     profileDiv.style.display = "block";
-                    window.parent.postMessage("showProfileInfo", "*");
                 }} else {{
                     profileDiv.style.display = "none";
-                    window.parent.postMessage("hideProfileInfo", "*");
                 }}
             }}
         </script>
@@ -179,8 +189,7 @@ else:
     # Display Profile Info if toggled
     if st.session_state.show_profile_info:
         st.markdown(f"""
-            <div id="profile-info" style="position: fixed; top: 60px; right: 10px; background-color: #f9f9f9; border: 1px solid #ddd; 
-                padding: 15px; width: 300px; z-index: 1000; text-align: right;">
+            <div id="profile-info">
                 <h4>Profile Info</h4>
                 <p><strong>Email:</strong> {st.session_state.user_email}</p>
             </div>
