@@ -115,7 +115,7 @@ if not st.session_state.login_successful:
 else:
     st.title("Test Case Generator")
 
-    # Profile Icon and Button to toggle profile info
+    # Profile Icon and Button to toggle profile info near the icon
     user_initial = st.session_state.user_email[0].upper()
 
     # Create the layout for the profile icon and button in the right corner
@@ -175,10 +175,6 @@ else:
     """, unsafe_allow_html=True)
 
     # Toggle Profile Info with Streamlit's session state
-    if 'show_profile_info' not in st.session_state:
-        st.session_state.show_profile_info = False
-
-    # Toggle based on the button click
     if st.session_state.show_profile_info:
         st.markdown(f"""
             <div id="profile-info" style="position: fixed; top: 60px; right: 10px; background-color: #f9f9f9; border: 1px solid #ddd; 
@@ -187,11 +183,6 @@ else:
                 <p><strong>Email:</strong> {st.session_state.user_email}</p>
             </div>
         """, unsafe_allow_html=True)
-
-    # Button action to change profile info visibility
-    toggle_button = st.button("Show Profile Info")
-    if toggle_button:
-        st.session_state.show_profile_info = not st.session_state.show_profile_info
 
     # Test case form and file uploads
     col1, col2, col3 = st.columns([1, 1, 1])
