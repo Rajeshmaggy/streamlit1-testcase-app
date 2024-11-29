@@ -49,7 +49,7 @@ st.markdown("""
     <style>
     .profile-icon {
         position: fixed;
-        top: 65px;
+        top: 15px;
         right: 20px;
         z-index: 1000;
         cursor: pointer;
@@ -127,17 +127,33 @@ else:
     user_initial = st.session_state.user_email[0].upper()
     st.markdown(
         f"""
-        <div class="profile-icon" onclick="alert('User Email: {st.session_state.user_email}')">
+        <div class="profile-icon" onclick="showProfileInfo()">
             <div class="profile-circle">{user_initial}</div>
         </div>
+        <script>
+        function showProfileInfo() {{
+            var profileDiv = document.getElementById('profile-info');
+            if (profileDiv.style.display === "none" || !profileDiv.style.display) {{
+                profileDiv.style.display = "block";
+            }} else {{
+                profileDiv.style.display = "none";
+            }}
+        }}
+        </script>
         """,
         unsafe_allow_html=True
     )
 
-    # Sidebar for profile info
-    if st.sidebar.button("Show Profile Info"):
-        st.sidebar.markdown("### User Profile:")
-        st.sidebar.write(f"**Email:** {st.session_state.user_email}")
+    # Right-aligned profile information container
+    st.markdown(
+        f"""
+        <div id="profile-info" style="display: none; position: fixed; top: 65px; right: 20px; width: 300px; background-color: #f9f9f9; border: 1px solid #ddd; padding: 15px; z-index: 1000; text-align: right;">
+            <h4 style="margin-bottom: 10px;">Profile Info</h4>
+            <p><strong>Email:</strong> {st.session_state.user_email}</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Align input fields and file upload in the same line using columns
     col1, col2, col3 = st.columns([1, 1, 1])
