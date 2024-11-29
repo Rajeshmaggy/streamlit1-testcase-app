@@ -123,7 +123,7 @@ else:
         <style>
             .profile-container {
                 position: fixed;
-                top: 10px;
+                top: 60px;
                 right: 10px;
                 z-index: 1000;
                 display: flex;
