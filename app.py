@@ -112,58 +112,81 @@ else:
         st.sidebar.write(f"**Email:** {st.session_state.user_email}")
         # You can add more info such as user history or additional profile details here
 
-    # Dropdown for Test Case type selection
-    test_case_type = st.selectbox(
-        "Select Test Case Type:",
-        ["Test Case Generation", "Test Case Validation", "Context Modeling"],
-        help="Choose the type of test case you are working on.",
+    # Inject custom CSS to make the dropdowns appear in one line
+    st.markdown(
+        """
+        <style>
+            .dropdown-container {
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+            }
+            .dropdown-container select {
+                width: 30%;  /* Adjust the width percentage as necessary */
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
     )
 
-    # If Test Case Generation is selected, show the file type selection
-    if test_case_type == "Test Case Generation":
-        content_type = st.selectbox(
-            "Select Content Type for Test Case:",
-            ["Photo", "Video", "Document"],
-            help="Choose the type of content related to this test case."
+    # Test Case Type Selection dropdown (in a single line)
+    with st.container():
+        st.markdown('<div class="dropdown-container">', unsafe_allow_html=True)
+        
+        # First Dropdown: Test Case Type
+        test_case_type = st.selectbox(
+            "Select Test Case Type:",
+            ["Test Case Generation", "Test Case Validation", "Context Modeling"],
+            help="Choose the type of test case you are working on.",
         )
 
-        # Content-specific file upload based on content type selected
-        uploaded_file = None
-        if content_type == "Video":
-            uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
-        elif content_type == "Photo":
-            uploaded_file = st.file_uploader("Upload your photo file:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-        elif content_type == "Document":
-            uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
+        # Second Dropdown: Content Type (based on Test Case Type)
+        if test_case_type == "Test Case Generation":
+            content_type = st.selectbox(
+                "Select Content Type for Test Case:",
+                ["Photo", "Video", "Document"],
+                help="Choose the type of content related to this test case."
+            )
+        
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        # Test case details input
-        test_case_details = st.text_area(
-            "Enter Test Case Details:",
-            help="Provide details about the test case you are performing.",
-        )
+    # File upload based on Content Type
+    uploaded_file = None
+    if content_type == "Video":
+        uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
+    elif content_type == "Photo":
+        uploaded_file = st.file_uploader("Upload your photo file:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+    elif content_type == "Document":
+        uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
 
-        # Submit button
-        if st.button("Submit Test Case"):
-            if 'user_email' not in st.session_state:
-                st.warning("Please log in to submit a test case.")
-            elif not test_case_details.strip():
-                st.warning("Please provide test case details.")
-            elif not uploaded_file:
-                st.warning("Please upload a file for the selected test case type.")
-            else:
-                # Handle multiple photos case
-                if isinstance(uploaded_file, list):  # For multiple files (photos)
-                    for file in uploaded_file:
-                        save_data(st.session_state.user_email, test_case_type, test_case_details, file.name)
-                    st.success(f"{len(uploaded_file)} photos uploaded and test case saved successfully!")
-                else:  # For single file (video/document)
-                    save_data(st.session_state.user_email, test_case_type, test_case_details, uploaded_file.name)
-                    st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
+    # Test case details input
+    test_case_details = st.text_area(
+        "Enter Test Case Details:",
+        help="Provide details about the test case you are performing.",
+    )
 
-                # Reload the user test cases
-                user_test_cases = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
+    # Submit button
+    if st.button("Submit Test Case"):
+        if 'user_email' not in st.session_state:
+            st.warning("Please log in to submit a test case.")
+        elif not test_case_details.strip():
+            st.warning("Please provide test case details.")
+        elif not uploaded_file:
+            st.warning("Please upload a file for the selected test case type.")
+        else:
+            # Handle multiple photos case
+            if isinstance(uploaded_file, list):  # For multiple files (photos)
+                for file in uploaded_file:
+                    save_data(st.session_state.user_email, test_case_type, test_case_details, file.name)
+                st.success(f"{len(uploaded_file)} photos uploaded and test case saved successfully!")
+            else:  # For single file (video/document)
+                save_data(st.session_state.user_email, test_case_type, test_case_details, uploaded_file.name)
+                st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
 
-                # Display the updated test cases in the sidebar
-                st.sidebar.markdown("### Your Updated Test Cases:")
-                for i, row in user_test_cases.iterrows():
-                    st.sidebar.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
+            # Reload the user test cases
+            user_test_cases = test_cases_df[test_cases_df["Email"] == st.session_state.user_email]
+
+            # Display the updated test cases in the sidebar
+            st.sidebar.markdown("### Your Updated Test Cases:")
+            for i, row in user_test_cases.iterrows():
+                st.sidebar.write(f"- **Type**: {row['Test Case Type']}, **Details**: {row['Test Case Details']}")
