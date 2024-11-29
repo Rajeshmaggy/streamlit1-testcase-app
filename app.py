@@ -58,7 +58,7 @@ st.markdown("""
             padding: 5px !important; /* Adjust padding for better alignment */
         }
         .stFileUploader > div > label {
-            font-size: 12px !important; /* Optional: Adjust label font size */
+            font-size: 8px !important; /* Optional: Adjust label font size */
         }
         /* Remove padding at the top */
         .css-1d391kg {
