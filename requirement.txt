@@ -1,7 +1,6 @@
-streamlit==1.25.0               # Web app framework
-pandas==2.1.1                   # For data handling
-pytesseract==0.3.10             # For OCR
-opencv-python-headless==4.8.1.78 # For OpenCV (headless for servers)
-groq==0.3.5                     # For video processing
-fpdf==1.7.2                     # For PDF generation
-openai==0.27.8 
+streamlit
+pandas
+opencv-python
+pytesseract
+fpdf
+groq
