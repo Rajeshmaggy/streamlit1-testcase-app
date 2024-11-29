@@ -50,7 +50,7 @@ st.markdown("""
     .profile-icon {
         position: fixed;
         top: 65px;
-        right: 20px;
+        right: 80px;
         z-index: 1000;
         cursor: pointer;
     }
@@ -65,6 +65,13 @@ st.markdown("""
         justify-content: center;
         font-size: 18px;
         font-weight: bold;
+    }
+    .profile-toggle-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        font-size: 12px;
     }
     .stFileUploader > div {
         height: 30px !important;
@@ -123,14 +130,14 @@ else:
     # Main section - Test Case Generator (Only visible after login)
     st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
-    # Profile icon (circle with initial)
+    # Profile icon (circle with initial) and profile info toggle button
     user_initial = st.session_state.user_email[0].upper()
     st.markdown(
         f"""
         <div class="profile-icon" onclick="showProfileInfo()">
             <div class="profile-circle">{user_initial}</div>
         </div>
-        <button id="profile-toggle-button" style="position: fixed; top: 75px; right: 20px; z-index: 1000; font-size: 12px;" onclick="showProfileInfo()">Show Profile Info</button>
+        <button id="profile-toggle-button" class="profile-toggle-button" onclick="showProfileInfo()">Show Profile Info</button>
         <script>
         function showProfileInfo() {{
             var profileDiv = document.getElementById('profile-info');
