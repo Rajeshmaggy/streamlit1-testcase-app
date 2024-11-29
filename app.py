@@ -46,10 +46,10 @@ if "show_modal" not in st.session_state:
 st.markdown(
     """
     <style>
-        /* Style for the top-right Login/Signup button */
+        /* Style for the Login/Signup button */
         .login-button {
             position: fixed;
-            top: 60px;
+            top: 10px;
             right: 20px;
             background-color: #007BFF;
             color: white;
@@ -64,82 +64,94 @@ st.markdown(
             background-color: #0056b3;
         }
 
-        /* Style for the modal popup */
+        /* Modal styling */
         .modal {
             position: fixed;
-            top: 20%;
+            top: 50%;
             left: 50%;
-            transform: translate(-50%, -20%);
+            transform: translate(-50%, -50%);
             width: 400px;
             background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
             z-index: 1001;
+            padding: 20px;
         }
 
-        /* Background dimming effect when modal is open */
+        /* Overlay to dim the background */
         .overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.4);
             z-index: 1000;
+        }
+
+        /* Close button inside modal */
+        .close-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            float: right;
+        }
+        .close-button:hover {
+            background-color: #d32f2f;
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Top-right corner Login/Signup button
+# Login/Signup button in the top-right corner
 st.markdown(
-    f"""
-    <button class="login-button" onclick="window.dispatchEvent(new Event('open_modal'))">
-        Login / Signup
-    </button>
+    """
+    <button class="login-button" onclick="window.dispatchEvent(new Event('showModal'))">Login / Signup</button>
     """,
     unsafe_allow_html=True,
 )
 
 # Handle modal display
-if st.button("Open Login Modal"):
+if st.button("Login / Signup", key="open_modal"):
     st.session_state.show_modal = True
 
-# Show the modal if triggered
 if st.session_state.show_modal:
-    # Overlay for dimmed background
+    # Add overlay effect
     st.markdown('<div class="overlay"></div>', unsafe_allow_html=True)
 
     # Modal content
     st.markdown(
         """
         <div class="modal">
-            <h3 style="text-align: center;">User Authentication</h3>
+            <h3 style="text-align: center;">Login or Signup</h3>
             <hr>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Authentication form inside modal
-    col1, col2, col3 = st.columns([1, 3, 1])
-    with col2:
-        auth_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
-        email = st.text_input("Email", key="auth_email")
-        password = st.text_input("Password", type="password", key="auth_password")
+    # Modal form
+    auth_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
+    email = st.text_input("Email", key="auth_email")
+    password = st.text_input("Password", type="password", key="auth_password")
 
-        if auth_option == "Login" and st.button("Login", key="login_button"):
-            if verify_login(email, password):
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("Login"):
+            if auth_option == "Login" and verify_login(email, password):
+                st.success("Login successful!")
                 st.session_state.logged_in = True
                 st.session_state.user_email = email
                 st.session_state.show_modal = False
                 st.experimental_rerun()
             else:
                 st.error("Invalid email or password.")
-        elif auth_option == "Signup" and st.button("Signup", key="signup_button"):
+    with col2:
+        if st.button("Signup"):
             if email in users_df["Email"].values:
                 st.error("This email is already registered.")
             else:
@@ -148,35 +160,23 @@ if st.session_state.show_modal:
                 st.session_state.show_modal = False
                 st.experimental_rerun()
 
-        if st.button("Close", key="close_modal"):
-            st.session_state.show_modal = False
-            st.experimental_rerun()
+    # Close button
+    if st.button("Close", key="close_modal"):
+        st.session_state.show_modal = False
+        st.experimental_rerun()
 
-# Main Test Case Generator content
+# Test Case Generator Main Content
+st.title("Test Case Generator")
 if st.session_state.logged_in:
-    st.sidebar.header("User Info")
-    st.sidebar.write(f"Logged in as: **{st.session_state.user_email}**")
+    st.sidebar.write(f"Logged in as: {st.session_state.user_email}")
 
-    st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
+    test_case_type = st.selectbox("Select Test Case Type:", ["Video", "Screenshot", "Document"])
+    uploaded_file = st.file_uploader("Upload your file:", type=["mp4", "jpg", "pdf"])
 
-    test_case_type = st.selectbox(
-        "Select Test Case Type:",
-        ["Video", "Screenshots", "Document"],
-        help="Choose the type of test case you are performing.",
-    )
-
-    uploaded_file = None
-    if test_case_type == "Video":
-        uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
-    elif test_case_type == "Screenshots":
-        uploaded_file = st.file_uploader("Upload your screenshots:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-    elif test_case_type == "Document":
-        uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
-
-    if st.button("Submit Test Case"):
+    if st.button("Submit"):
         if uploaded_file:
-            st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
+            st.success(f"Test case submitted with file: {uploaded_file.name}")
         else:
-            st.warning("Please upload a file before submitting!")
+            st.warning("Please upload a file before submitting.")
 else:
-    st.warning("Please login to use the Test Case Generator.")
+    st.warning("Please login to access the Test Case Generator.")
