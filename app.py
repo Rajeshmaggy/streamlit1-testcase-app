@@ -143,7 +143,7 @@ else:
     # Profile icon (circle with initial)
     user_initial = st.session_state.user_email[0].upper()
     profile_icon = st.markdown(
-        f'<div style="position: absolute; top: 10px; right: 20px;  display: flex;  justify-content: flex-end; align-items: center; z-index: 1000;">'
+        f'<div style=" position: absolute;top: 10px; right: 20px;display: flex;justify-content: flex-end;align-items: center;z-index: 1000;">'
         f'<div style="border-radius: 50%; background-color: #4CAF50; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="alert(\'Profile Info\')">{user_initial}</div>'
         '</div>',
         unsafe_allow_html=True
