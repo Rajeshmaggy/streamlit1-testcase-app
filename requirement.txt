@@ -1,6 +1,7 @@
 streamlit
 pandas
 opencv-python
+opencv-contrib-python
 pytesseract
 fpdf
 groq
