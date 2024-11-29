@@ -123,7 +123,7 @@ else:
         <style>
             .profile-container {
                 position: fixed;
-                top: 60px;
+                top: 10px;
                 right: 10px;
                 z-index: 1000;
                 display: flex;
@@ -153,7 +153,7 @@ else:
     # Profile icon and button
     st.markdown(f"""
         <div class="profile-container">
-            <div class="profile-icon" onclick="window.location.reload();">
+            <div class="profile-icon" onclick="toggleProfileInfo()">
                 {user_initial}
             </div>
             <button class="profile-button" onclick="toggleProfileInfo()">
@@ -165,14 +165,20 @@ else:
                 var profileDiv = document.getElementById('profile-info');
                 if (profileDiv.style.display === "none" || !profileDiv.style.display) {{
                     profileDiv.style.display = "block";
+                    window.parent.postMessage("showProfileInfo", "*");
                 }} else {{
                     profileDiv.style.display = "none";
+                    window.parent.postMessage("hideProfileInfo", "*");
                 }}
             }}
         </script>
     """, unsafe_allow_html=True)
 
-    # Profile info section
+    # Toggle Profile Info with Streamlit's session state
+    if 'show_profile_info' not in st.session_state:
+        st.session_state.show_profile_info = False
+
+    # Toggle based on the button click
     if st.session_state.show_profile_info:
         st.markdown(f"""
             <div id="profile-info" style="position: fixed; top: 60px; right: 10px; background-color: #f9f9f9; border: 1px solid #ddd; 
@@ -181,6 +187,11 @@ else:
                 <p><strong>Email:</strong> {st.session_state.user_email}</p>
             </div>
         """, unsafe_allow_html=True)
+
+    # Button action to change profile info visibility
+    toggle_button = st.button("Show Profile Info")
+    if toggle_button:
+        st.session_state.show_profile_info = not st.session_state.show_profile_info
 
     # Test case form and file uploads
     col1, col2, col3 = st.columns([1, 1, 1])
