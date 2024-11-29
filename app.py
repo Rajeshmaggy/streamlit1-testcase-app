@@ -27,88 +27,72 @@ def verify_login(email, password):
     return any((users_df["Email"] == email) & (users_df["Password"] == password))
 
 # Session states
-if "show_modal" not in st.session_state:
-    st.session_state.show_modal = False
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_email" not in st.session_state:
     st.session_state.user_email = ""
+if "show_form" not in st.session_state:
+    st.session_state.show_form = False
 
-# Header with login/signup button
+# Custom CSS for positioning the button
+st.markdown(
+    """
+    <style>
+    .top-right-button {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        z-index: 1000;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Top-right button
 if not st.session_state.logged_in:
-    if st.button("Login / Signup", key="login_button"):
-        st.session_state.show_modal = True
-else:
-    st.button(f"Logged in as {st.session_state.user_email}", disabled=True)
-
-# Modal for login/signup
-if st.session_state.show_modal:
-    # Add a modal effect
     st.markdown(
-        """
-        <style>
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .modal-content {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 400px;
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            z-index: 1100;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
-        }
-        </style>
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-        """,
+        '<button class="top-right-button" onclick="document.getElementById(\'auth-form\').style.display=\'block\'">Login / Signup</button>',
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        f'<button class="top-right-button" disabled>Welcome, {st.session_state.user_email}</button>',
         unsafe_allow_html=True,
     )
 
-    # Login/Signup modal content
-    st.write("### User Authentication")
-    auth_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
-    email = st.text_input("Email", key="auth_email")
-    password = st.text_input("Password", type="password", key="auth_password")
-
-    if auth_option == "Login":
-        if st.button("Login"):
-            if verify_login(email, password):
-                st.session_state.logged_in = True
-                st.session_state.user_email = email
-                st.session_state.show_modal = False
-                st.experimental_rerun()
-            else:
-                st.error("Invalid email or password.")
-    elif auth_option == "Signup":
-        if st.button("Signup"):
-            if email in users_df["Email"].values:
-                st.error("This email is already registered.")
-            else:
-                add_user(email, password)
-                st.success("Signup successful! Please login.")
-                st.session_state.show_modal = False
-                st.experimental_rerun()
-
-    # Close button
-    if st.button("Close"):
-        st.session_state.show_modal = False
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# Main content (background)
+# Authentication form
 if not st.session_state.logged_in:
-    st.warning("Please login to use the Test Case Generator.")
-else:
+    with st.container():
+        if st.session_state.show_form or st.button("Show Login / Signup Form"):
+            st.session_state.show_form = True
+            st.write("### User Authentication")
+            auth_option = st.radio("Choose an option:", ["Login", "Signup"], key="auth_option")
+            email = st.text_input("Email", key="auth_email")
+            password = st.text_input("Password", type="password", key="auth_password")
+
+            if auth_option == "Login":
+                if st.button("Login"):
+                    if verify_login(email, password):
+                        st.session_state.logged_in = True
+                        st.session_state.user_email = email
+                        st.session_state.show_form = False
+                        st.experimental_rerun()
+                    else:
+                        st.error("Invalid email or password.")
+            elif auth_option == "Signup":
+                if st.button("Signup"):
+                    if email in users_df["Email"].values:
+                        st.error("This email is already registered.")
+                    else:
+                        add_user(email, password)
+                        st.success("Signup successful! Please login.")
+                        st.session_state.show_form = False
+                        st.experimental_rerun()
+
+# Main content
+if st.session_state.logged_in:
     st.success(f"Welcome {st.session_state.user_email}! You are logged in.")
     st.text_area("Test Case Generator:", "Enter your test case details here...")
+else:
+    st.warning("Please login to use the Test Case Generator.")
