@@ -48,7 +48,7 @@ def save_data(email, test_case_type, file_name):
 st.markdown("""
     <style>
     .stFileUploader > div {
-        height: 30px !important; /* Adjust height */
+        height: 10px !important; /* Adjust height */
         padding: 5px !important; /* Adjust padding */
     }
     .stFileUploader > div > label {
