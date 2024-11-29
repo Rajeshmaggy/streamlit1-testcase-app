@@ -98,6 +98,20 @@ else:
     # Main section - Test Case Generator (Only visible after login)
     st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
+    # Profile icon
+    user_initial = st.session_state.user_email[0].upper()
+    profile_icon = st.markdown(
+        f'<div style="display: flex; justify-content: flex-end; align-items: center;">'
+        f'<div style="border-radius: 50%; background-color: #4CAF50; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="alert(\'Profile Info\')">{user_initial}</div>'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    # Sidebar for profile info
+    if st.sidebar.button("Show Profile Info"):
+        st.sidebar.write(f"**Email:** {st.session_state.user_email}")
+        # You can add more info such as user history or additional profile details here
+
     # Dropdown for Test Case type selection
     test_case_type = st.selectbox(
         "Select Test Case Type:",
