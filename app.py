@@ -148,7 +148,7 @@ else:
         # You can add more info such as user history or additional profile details here
 
     # Align input fields and file upload in the same line using columns
-    col1, col2, col3 = st.columns([1, 1, 2])
+    col1, col2, col3 = st.columns([1, 1, 1])
 
     with col1:
         # Dropdown for Test Case Type
