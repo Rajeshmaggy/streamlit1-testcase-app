@@ -1,6 +1,8 @@
 streamlit==1.25.0               # Web app framework
 pandas==2.1.1                   # For data handling
-cv2 # For video processing (headless for servers)
+pytesseract
+opencv-python
+groq # For video processing (headless for servers)
 pytesseract==0.3.10             # For OCR
 fpdf==1.7.2                     # For PDF generation
 openai==0.27.8                  # GPT model (if used)
