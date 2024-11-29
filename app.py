@@ -44,19 +44,34 @@ def save_data(email, test_case_type, file_name):
     test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
     test_cases_df.to_csv(DATA_FILE, index=False)
 
-# Custom CSS to style the file uploader and align elements
+# Custom CSS for profile icon and alignment
 st.markdown("""
     <style>
+    .profile-icon {
+        position: fixed;
+        top: 10px;
+        right: 20px;
+        z-index: 1000;
+        cursor: pointer;
+    }
+    .profile-circle {
+        border-radius: 50%;
+        background-color: #4CAF50;
+        color: white;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+    }
     .stFileUploader > div {
-        height: 10px !important; /* Adjust height */
-        padding: 5px !important; /* Adjust padding */
+        height: 30px !important;
+        padding: 5px !important;
     }
     .stFileUploader > div > label {
-        font-size: 12px !important; /* Adjust label font size */
-    }
-    /* General spacing adjustments */
-    .stApp {
-        margin-top: 0px !important;
+        font-size: 12px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -111,11 +126,18 @@ else:
     # Profile icon (circle with initial)
     user_initial = st.session_state.user_email[0].upper()
     st.markdown(
-        f'<div style="position: absolute; top: 10px; right: 20px; display: flex; justify-content: flex-end; align-items: center; z-index: 1000;">'
-        f'<div style="border-radius: 50%; background-color: #4CAF50; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer;" onclick="alert(\'Profile Info\')">{user_initial}</div>'
-        '</div>',
+        f"""
+        <div class="profile-icon" onclick="alert('User Email: {st.session_state.user_email}')">
+            <div class="profile-circle">{user_initial}</div>
+        </div>
+        """,
         unsafe_allow_html=True
     )
+
+    # Sidebar for profile info
+    if st.sidebar.button("Show Profile Info"):
+        st.sidebar.markdown("### User Profile:")
+        st.sidebar.write(f"**Email:** {st.session_state.user_email}")
 
     # Align input fields and file upload in the same line using columns
     col1, col2, col3 = st.columns([1, 1, 1])
