@@ -117,7 +117,7 @@ else:
     user_initial = st.session_state.user_email[0].upper()
     st.markdown(
         f"""
-        <div style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+        <div style="position: fixed; top: 65px; right: 10px; z-index: 1000;">
             <div style="display: flex; align-items: center; cursor: pointer;">
                 <div style="border-radius: 50%; background-color: #4CAF50; color: white; 
                     width: 40px; height: 40px; display: flex; align-items: center; 
