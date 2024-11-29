@@ -1,5 +1,6 @@
 streamlit
 pandas
+pytesseract opencv-python groq
 opencv-python
 opencv-contrib-python
 pytesseract
