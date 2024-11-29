@@ -123,7 +123,7 @@ else:
         <style>
             .profile-container {
                 position: fixed;
-                top: 60px;
+                top: 10px;
                 right: 10px;
                 z-index: 1000;
                 display: flex;
@@ -174,7 +174,7 @@ else:
         </script>
     """, unsafe_allow_html=True)
 
-    # Toggle Profile Info with Streamlit's session state
+    # Display Profile Info if toggled
     if st.session_state.show_profile_info:
         st.markdown(f"""
             <div id="profile-info" style="position: fixed; top: 60px; right: 10px; background-color: #f9f9f9; border: 1px solid #ddd; 
