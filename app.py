@@ -60,23 +60,17 @@ def display_sidebar():
     with st.sidebar:
         st.markdown("### Upload and History")
 
-        # Show file upload section
-        uploaded_file = None
-        if test_case_type == "Test Case Generation":
-            uploaded_file = st.file_uploader("Upload Photo", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-        elif test_case_type == "Test Case Validation":
-            uploaded_file = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"])
-        elif test_case_type == "Context Modeling":
-            uploaded_file = st.file_uploader("Upload Document", type=["pdf", "docx", "txt"])
+        # Show file upload section (static, not dynamic based on test case type)
+        uploaded_files = st.file_uploader("Upload Files", type=["png", "jpg", "jpeg", "mp4", "mov", "avi", "pdf", "docx", "txt"], accept_multiple_files=True)
 
-        if uploaded_file:
-            if isinstance(uploaded_file, list):
-                for file in uploaded_file:
-                    save_data(st.session_state.user_email, test_case_type, file.name)
-                st.success(f"{len(uploaded_file)} files uploaded successfully!")
+        if uploaded_files:
+            if isinstance(uploaded_files, list):
+                for file in uploaded_files:
+                    save_data(st.session_state.user_email, "File Upload", file.name)
+                st.success(f"{len(uploaded_files)} files uploaded successfully!")
             else:
-                save_data(st.session_state.user_email, test_case_type, uploaded_file.name)
-                st.success(f"File '{uploaded_file.name}' uploaded successfully!")
+                save_data(st.session_state.user_email, "File Upload", uploaded_files.name)
+                st.success(f"File '{uploaded_files.name}' uploaded successfully!")
 
         # Show user history section (in text format)
         st.markdown("### Your Test Cases")
@@ -195,7 +189,7 @@ else:
             </div>
         """, unsafe_allow_html=True)
 
-    # Test case form and file uploads
+    # Test case form and file uploads in a single row (static, no content type dynamic change)
     col1, col2, col3 = st.columns([1, 1, 2])
 
     with col1:
@@ -205,33 +199,32 @@ else:
         )
 
     with col2:
-        content_type = None
-        if test_case_type == "Test Case Generation":
-            content_type = st.selectbox(
-                "Content Type", ["Photo", "Video", "Document"]
-            )
+        content_type = st.selectbox(
+            "Content Type", ["Photo", "Video", "Document"]
+        )
 
     with col3:
-        uploaded_file = None
-        if content_type == "Photo":
-            uploaded_file = st.file_uploader("Upload Photo", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
-        elif content_type == "Video":
-            uploaded_file = st.file_uploader("Upload Video", type=["mp4", "mov", "avi"])
-        elif content_type == "Document":
-            uploaded_file = st.file_uploader("Upload Document", type=["pdf", "docx", "txt"])
+        uploaded_files = st.file_uploader(
+            "Upload Files", 
+            type=["png", "jpg", "jpeg", "mp4", "mov", "avi", "pdf", "docx", "txt"], 
+            accept_multiple_files=True
+        )
 
     # Submit button for saving the test case
     if st.button("Submit Test Case"):
         if 'user_email' not in st.session_state:
             st.warning("Please log in to submit a test case.")
-        elif not uploaded_file:
+        elif not uploaded_files:
             st.warning("Please upload a file for the selected content type.")
         else:
-            # Handle multiple photos case
-            if isinstance(uploaded_file, list):  # For multiple files (photos)
-                for file in uploaded_file:
+            # Handle multiple files case
+            if isinstance(uploaded_files, list):  # For multiple files (photos)
+                for file in uploaded_files:
                     save_data(st.session_state.user_email, test_case_type, file.name)
-                st.success(f"{len(uploaded_file)} photos uploaded and test case saved successfully!")
+                st.success(f"{len(uploaded_files)} files uploaded and test case saved successfully!")
             else:  # For single file (video/document)
-                save_data(st.session_state.user_email, test_case_type, uploaded_file.name)
-                st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
+                save_data(st.session_state.user_email, test_case_type, uploaded_files.name)
+                st.success(f"Test case with file '{uploaded_files.name}' saved successfully!")
+
+    # Call sidebar display function
+    display_sidebar()
