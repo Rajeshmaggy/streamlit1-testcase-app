@@ -9,7 +9,7 @@ st.set_page_config(page_title="Test Case Generator", layout="wide")
 DATA_FILE = "test_cases.csv"
 USERS_FILE = "users.csv"
 
-# Load test case data or create a new DataFrame
+# Load or create test case data
 if os.path.exists(DATA_FILE):
     test_cases_df = pd.read_csv(DATA_FILE)
 else:
@@ -21,20 +21,31 @@ if os.path.exists(USERS_FILE):
 else:
     users_df = pd.DataFrame(columns=["Email", "Password"])
 
-# Functions for data handling
+# Helper functions
+def save_test_case(email, test_case_type, test_case_details, file_name):
+    """Save test case details."""
+    new_entry = pd.DataFrame({
+        "Email": [email],
+        "Test Case Type": [test_case_type],
+        "Test Case Details": [test_case_details],
+        "File Name": [file_name],
+    })
+    global test_cases_df
+    test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
+    test_cases_df.to_csv(DATA_FILE, index=False)
+
 def add_user(email, password):
     """Add a new user."""
-    global users_df
     new_user = pd.DataFrame({"Email": [email], "Password": [password]})
+    global users_df
     users_df = pd.concat([users_df, new_user], ignore_index=True)
     users_df.to_csv(USERS_FILE, index=False)
 
 def verify_login(email, password):
     """Verify user login credentials."""
-    global users_df
     return any((users_df["Email"] == email) & (users_df["Password"] == password))
 
-# Initialize session states
+# Initialize session state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_email" not in st.session_state:
@@ -42,17 +53,66 @@ if "user_email" not in st.session_state:
 if "show_modal" not in st.session_state:
     st.session_state.show_modal = False
 
-# Top-right corner button
-if st.session_state.logged_in:
-    st.markdown(
-        f"<div style='position: absolute; top: 20px; right: 20px;'>Logged in as: {st.session_state.user_email}</div>",
-        unsafe_allow_html=True,
-    )
-else:
-    if st.button("Login/Signup", key="open_modal"):
-        st.session_state.show_modal = True
+# Main Test Case Generator content
+st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
 
-# Modal popup for authentication
+if st.session_state.logged_in:
+    st.sidebar.header("User Info")
+    st.sidebar.write(f"Logged in as: **{st.session_state.user_email}**")
+
+    # Dropdown to select test case type
+    test_case_type = st.selectbox(
+        "Select Test Case Type:",
+        ["Video", "Screenshots", "Document"],
+        help="Choose the type of test case you are performing.",
+    )
+
+    uploaded_file = None
+    if test_case_type == "Video":
+        uploaded_file = st.file_uploader("Upload your video file:", type=["mp4", "mov", "avi"])
+    elif test_case_type == "Screenshots":
+        uploaded_file = st.file_uploader("Upload your screenshots:", type=["png", "jpg", "jpeg"], accept_multiple_files=True)
+    elif test_case_type == "Document":
+        uploaded_file = st.file_uploader("Upload your document:", type=["pdf", "docx", "txt"])
+
+    if st.button("Submit Test Case"):
+        if uploaded_file:
+            if isinstance(uploaded_file, list):  # Multiple screenshots
+                for file in uploaded_file:
+                    save_test_case(st.session_state.user_email, test_case_type, "Details not provided", file.name)
+                st.success(f"{len(uploaded_file)} screenshots uploaded and saved!")
+            else:
+                save_test_case(st.session_state.user_email, test_case_type, "Details not provided", uploaded_file.name)
+                st.success(f"Test case with file '{uploaded_file.name}' saved successfully!")
+        else:
+            st.warning("Please upload a file before submitting!")
+
+else:
+    st.warning("Please log in to access the Test Case Generator.")
+
+# Top-right Login/Signup button
+button_html = """
+<div style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;">
+    <button onclick="window.dispatchEvent(new Event('modal_open'))"
+            style="
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                padding: 10px 15px;
+                cursor: pointer;
+                font-size: 14px;">
+        Login / Signup
+    </button>
+</div>
+"""
+st.markdown(button_html, unsafe_allow_html=True)
+
+# Display modal popup for login/signup
 if st.session_state.show_modal:
     st.markdown(
         """
@@ -62,35 +122,21 @@ if st.session_state.show_modal:
             left: 50%;
             transform: translate(-50%, -50%);
             width: 400px;
-            background-color: #fff;
+            background-color: white;
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 30px;
             box-shadow: 0px 4px 20px rgba(0,0,0,0.2);
-            z-index: 10;">
-            <h3 style="text-align: center; font-family: Arial, sans-serif; margin-bottom: 20px;">Login</h3>
-            <div style="text-align: center; margin-bottom: 20px;">
-                <button style="
-                    width: 100%;
-                    padding: 10px;
-                    background-color: #4285F4;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                    cursor: pointer;
-                ">Sign in with Google</button>
-            </div>
-            <div style="text-align: center; margin: 10px 0;">
-                <span style="color: #aaa;">or</span>
-            </div>
+            z-index: 10000;">
+            <h3 style="text-align: center;">Login / Signup</h3>
+            <div style="margin: 20px 0;">
         """,
         unsafe_allow_html=True,
     )
 
-    # Email and Password inputs inside the modal
-    email = st.text_input("Email", key="auth_email", placeholder="Your email")
-    password = st.text_input("Password", type="password", key="auth_password", placeholder="Your password")
-    remember_me = st.checkbox("Remember me", key="remember_me")
+    # Email and password inputs
+    email = st.text_input("Email", key="auth_email", placeholder="Enter your email")
+    password = st.text_input("Password", type="password", key="auth_password", placeholder="Enter your password")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -108,20 +154,25 @@ if st.session_state.show_modal:
                 st.error("This email is already registered.")
             else:
                 add_user(email, password)
-                st.success("Signup successful! Please login.")
+                st.success("Signup successful! Please log in.")
                 st.session_state.show_modal = False
                 st.experimental_rerun()
 
-    # Close button
-    if st.button("Close", key="close_modal"):
+    if st.button("Close"):
         st.session_state.show_modal = False
         st.experimental_rerun()
 
+    # Close modal tag
     st.markdown("</div>", unsafe_allow_html=True)
 
-# Main Test Case Generator content
-if st.session_state.logged_in:
-    st.markdown("<h1 style='text-align: center;'>Test Case Generator</h1>", unsafe_allow_html=True)
-    st.write("Welcome to the Test Case Generator! You are now logged in.")
-else:
-    st.warning("Please login to access the Test Case Generator.")
+# JavaScript to trigger modal popup
+st.markdown(
+    """
+    <script>
+    document.addEventListener('modal_open', function () {
+        window.parent.postMessage({type: 'SHOW_MODAL'}, '*');
+    });
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
