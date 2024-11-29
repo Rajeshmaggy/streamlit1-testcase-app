@@ -70,7 +70,10 @@ if st.session_state.login_successful:
                 filtered_history = user_history[user_history["Test Case Type"] == filter_type]
             else:
                 filtered_history = user_history
-            st.dataframe(filtered_history[["Test Case Type", "File Name"]].reset_index(drop=True))
+            st.dataframe(
+                filtered_history[["Test Case Type", "File Name"]].reset_index(drop=True),
+                use_container_width=True
+            )
 
 # Login or Signup Page
 if not st.session_state.login_successful:
@@ -109,6 +112,42 @@ if not st.session_state.login_successful:
 # Main Test Case Generator (after login)
 else:
     st.title("Test Case Generator")
+
+    # Profile Icon and Info
+    user_initial = st.session_state.user_email[0].upper()
+    st.markdown(
+        f"""
+        <div style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
+            <div style="display: flex; align-items: center; cursor: pointer;">
+                <div style="border-radius: 50%; background-color: #4CAF50; color: white; 
+                    width: 40px; height: 40px; display: flex; align-items: center; 
+                    justify-content: center; font-size: 18px; font-weight: bold;"
+                >
+                    {user_initial}
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Profile Info Toggle Button
+    if "show_profile_info" not in st.session_state:
+        st.session_state.show_profile_info = False
+
+    if st.button("Show Profile Info"):
+        st.session_state.show_profile_info = not st.session_state.show_profile_info
+
+    if st.session_state.show_profile_info:
+        st.markdown(f"""
+            <div style="border: 1px solid #ddd; padding: 15px; background-color: #f9f9f9; 
+                position: fixed; top: 60px; right: 10px; width: 300px; z-index: 1000;"
+            >
+                <h4>Profile Info</h4>
+                <p><strong>Email:</strong> {st.session_state.user_email}</p>
+            </div>
+        """, unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns([1, 1, 1])
 
     with col1:
