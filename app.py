@@ -115,29 +115,34 @@ if not st.session_state.login_successful:
 else:
     st.title("Test Case Generator")
 
-    # Profile Icon and Info Toggle
+    # Profile Icon and Button to toggle profile info
     user_initial = st.session_state.user_email[0].upper()
 
-    # Display profile icon and toggle button
-    if st.button("Show Profile Info", key="show_profile_button"):
-        st.session_state.show_profile_info = not st.session_state.show_profile_info
+    # Create the layout for the profile icon and button
+    col1, col2 = st.columns([1, 0.1])
 
-    st.markdown(
-        f"""
-        <div style="position: fixed; top: 10px; right: 10px; z-index: 1000;">
-            <div style="display: flex; align-items: center; cursor: pointer;">
+    with col1:
+        st.markdown(
+            f"""
+            <div style="cursor: pointer; display: flex; align-items: center;">
                 <div style="border-radius: 50%; background-color: #4CAF50; color: white; 
                     width: 40px; height: 40px; display: flex; align-items: center; 
                     justify-content: center; font-size: 18px; font-weight: bold;"
+                    onclick="window.location.reload();"
                 >
                     {user_initial}
                 </div>
             </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+            """,
+            unsafe_allow_html=True
+        )
 
+    with col2:
+        # Small button to toggle profile info
+        if st.button("Show Profile Info", key="profile_info_button", help="Click to show your profile info", use_container_width=True):
+            st.session_state.show_profile_info = not st.session_state.show_profile_info
+
+    # Toggle profile info visibility based on the button click
     if st.session_state.show_profile_info:
         st.markdown(f"""
             <div style="border: 1px solid #ddd; padding: 15px; background-color: #f9f9f9; 
