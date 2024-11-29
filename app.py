@@ -49,7 +49,7 @@ st.markdown("""
     <style>
     .profile-icon {
         position: fixed;
-        top: 35px;
+        top: 55px;
         right: 20px;
         z-index: 1000;
         cursor: pointer;
