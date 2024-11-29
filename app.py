@@ -49,7 +49,7 @@ st.markdown(
         /* Style for the top-right Login/Signup button */
         .login-button {
             position: fixed;
-            top: 20px;
+            top: 60px;
             right: 20px;
             background-color: #007BFF;
             color: white;
