@@ -37,6 +37,20 @@ def check_credentials(email, password):
         return True
     return False
 
+# Function to save test case data
+def save_data(email, test_case_type, test_case_details, file_name):
+    global test_cases_df
+    new_entry = pd.DataFrame(
+        {
+            "Email": [email],
+            "Test Case Type": [test_case_type],
+            "Test Case Details": [test_case_details],
+            "File Name": [file_name],
+        }
+    )
+    test_cases_df = pd.concat([test_cases_df, new_entry], ignore_index=True)
+    test_cases_df.to_csv(DATA_FILE, index=False)
+
 # Main section content
 if 'login_successful' not in st.session_state or not st.session_state.login_successful:
     # Login / Signup page content
