@@ -118,41 +118,71 @@ else:
     # Profile Icon and Button to toggle profile info
     user_initial = st.session_state.user_email[0].upper()
 
-    # Create the layout for the profile icon and button
-    col1, col2 = st.columns([1, 0.1])
+    # Create the layout for the profile icon and button in the right corner
+    st.markdown("""
+        <style>
+            .profile-container {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+            }
+            .profile-icon {
+                border-radius: 50%;
+                background-color: #4CAF50;
+                color: white;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .profile-button {
+                margin-left: 10px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-    with col1:
-        st.markdown(
-            f"""
-            <div style="cursor: pointer; display: flex; align-items: center;">
-                <div style="border-radius: 50%; background-color: #4CAF50; color: white; 
-                    width: 40px; height: 40px; display: flex; align-items: center; 
-                    justify-content: center; font-size: 18px; font-weight: bold;"
-                    onclick="window.location.reload();"
-                >
-                    {user_initial}
-                </div>
+    # Profile icon and button
+    st.markdown(f"""
+        <div class="profile-container">
+            <div class="profile-icon" onclick="window.location.reload();">
+                {user_initial}
             </div>
-            """,
-            unsafe_allow_html=True
-        )
+            <button class="profile-button" onclick="toggleProfileInfo()">
+                Show Profile Info
+            </button>
+        </div>
+        <script>
+            function toggleProfileInfo() {{
+                var profileDiv = document.getElementById('profile-info');
+                if (profileDiv.style.display === "none" || !profileDiv.style.display) {{
+                    profileDiv.style.display = "block";
+                }} else {{
+                    profileDiv.style.display = "none";
+                }}
+            }}
+        </script>
+    """, unsafe_allow_html=True)
 
-    with col2:
-        # Small button to toggle profile info
-        if st.button("Show Profile Info", key="profile_info_button", help="Click to show your profile info", use_container_width=True):
-            st.session_state.show_profile_info = not st.session_state.show_profile_info
-
-    # Toggle profile info visibility based on the button click
+    # Profile info section
     if st.session_state.show_profile_info:
         st.markdown(f"""
-            <div style="border: 1px solid #ddd; padding: 15px; background-color: #f9f9f9; 
-                position: fixed; top: 60px; right: 10px; width: 300px; z-index: 1000;"
-            >
+            <div id="profile-info" style="position: fixed; top: 60px; right: 10px; background-color: #f9f9f9; border: 1px solid #ddd; 
+                padding: 15px; width: 300px; z-index: 1000; text-align: right;">
                 <h4>Profile Info</h4>
                 <p><strong>Email:</strong> {st.session_state.user_email}</p>
             </div>
         """, unsafe_allow_html=True)
 
+    # Test case form and file uploads
     col1, col2, col3 = st.columns([1, 1, 1])
 
     with col1:
