@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-import cv2
+# import cv2
 import pytesseract
 from fpdf import FPDF  # Import the FPDF library
 import tempfile
