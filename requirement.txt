@@ -1,9 +1,17 @@
 streamlit
 pandas
-pytesseract opencv-python groq
 opencv-python
-opencv-contrib-python
 pytesseract
 fpdf
+tempfile
 groq
-cv2
+re
+PyPDF2
+Pillow
+pdfminer.six
+python-docx
+PyMuPDF
+torch
+transformers
+scikit-learn
+numpy
