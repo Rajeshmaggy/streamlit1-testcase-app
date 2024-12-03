@@ -1,3 +1,4 @@
+cv2
 streamlit
 pandas
 opencv-python
