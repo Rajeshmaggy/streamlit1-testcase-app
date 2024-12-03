@@ -1,4 +1,18 @@
+opencv-python
 streamlit
 pandas
-openpyxl  # Optional: If your app uses Excel files
-numpy     # Optional: If your app uses NumPy
+opencv-python
+pytesseract
+fpdf
+tempfile
+groq
+re
+PyPDF2
+Pillow
+pdfminer.six
+python-docx
+PyMuPDF
+torch
+transformers
+scikit-learn
+numpy
