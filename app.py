@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
-# import cv2
+import cv2
 import pytesseract
 from fpdf import FPDF  # Import the FPDF library
 import tempfile
@@ -45,8 +45,6 @@ from pdfminer.high_level import extract_text as extract_text_from_pdf
 from docx import Document
 from pytesseract import image_to_string
 from PIL import Image
-import openpyxl
-from openpyxl import load_workbook
 
 # Required Library for the Groq API
 # from groq.api import Groq
@@ -297,12 +295,12 @@ else:
     with col2:
         content_type = st.selectbox(
             "Content Type",
-            ["Screenshots", "Video", "Document","xl"]
+            ["Screenshots", "Video", "Document"]
         )
     with col3:
 
 # File uploader inside the column (col3)
-        uploaded_file = col3.file_uploader("Upload File", type=["mp4", "mov", "avi", "pdf", "docx", "png", "jpg", "jpeg","csv"])
+        uploaded_file = col3.file_uploader("Upload File", type=["mp4", "mov", "avi", "pdf", "docx", "png", "jpg", "jpeg"])
 
 # Check if a file is uploaded
 # if uploaded_file:
@@ -325,117 +323,6 @@ else:
     if st.button("Submit Test Case"):
         if not uploaded_file:
             st.warning("Please upload a file.")
-        elif test_case_type == "Test Case Calidation":
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_file.write(uploaded_file.read())
-                video_path = temp_file.name
-            try:
-                    # Load the Excel file
-                    wb = load_workbook(video_path)
-                    ws = wb.active
-                    df = pd.read_excel(video_path)
-
-                    # Validate columns
-                    if "Expected Results" not in df.columns:
-                        st.error("Missing 'Expected Results' column.")
-                        st.error(f"File {uploaded_file.name} is missing the 'Expected Results' column.")
-                        
-                        # continue
-
-                    # Select columns up to "Expected Results"
-                    idx = df.columns.get_loc("Expected Results")
-                    df_selected = df.iloc[:, :idx + 1]
-
-                    # Filter out rows with strikethrough in any cell
-                    rows_to_keep = []
-                    for row_idx, row in df.iterrows():
-                        keep_row = True
-                        for col_idx in range(len(df.columns)):
-                            cell = ws.cell(row=row_idx + 2, column=col_idx + 1)
-                            if cell.font and cell.font.strike:
-                                keep_row = False
-                                break
-                        if keep_row:
-                            rows_to_keep.append(row_idx)
-                    df_filtered = df.iloc[rows_to_keep]
-
-                    # Perform test case evaluation using Groq API
-                    results = {
-                        "Test Case Number": [],
-                        "Clarity": [],
-                        "Coverage": [],
-                        "Overall Quality": []
-                    }
-
-                    for idx, test_case in df_filtered.iterrows():
-                        scenario = test_case["Scenario"]
-                        prerequisite = test_case.get("Prerequisite", "")
-                        test_steps = test_case["Test Steps"]
-                        expected_result = test_case["Expected Results"]
-
-                        # Construct prompt for Groq
-                        prompt = f"""
-                        You are an expert in QA. Evaluate this test case and provide:
-                        1. Scores out of 10 for: Clarity, Coverage, and Overall Quality.
-                        2. Specific suggestions to improve each category.
-
-                        Scenario: {scenario}
-                        Precondition: {prerequisite}
-                        Test Steps: {test_steps}
-                        Expected Result: {expected_result}
-                        Respond with scores and recommendations for improvement.
-                        """
-
-                        try:
-                            response = client.chat.completions.create(
-                                messages=[{"role": "user", "content": prompt}],
-                                model="llama3-70b-8192",
-                                temperature=0
-                            )
-                            evaluation = response.choices[0].message.content
-
-                            # Extract scores and suggestions from the response
-                            clarity_match = re.search(r"1\.\s*Clarity:\s*(\d+)/10", evaluation)
-                            coverage_match = re.search(r"2\.\s*Coverage:\s*(\d+)/10", evaluation)
-                            overall_quality_match = re.search(r"3\.\s*Overall Quality:\s*(\d+)/10", evaluation)
-
-                            clarity = clarity_match.group(1) if clarity_match else "N/A"
-                            coverage = coverage_match.group(1) if coverage_match else "N/A"
-                            overall_quality = overall_quality_match.group(1) if overall_quality_match else "N/A"
-
-                            results["Test Case Number"].append(f"TC {idx + 1}")
-                            results["Clarity"].append(f"{clarity}/10")
-                            results["Coverage"].append(f"{coverage}/10")
-                            results["Overall Quality"].append(f"{overall_quality}/10")
-
-                        except Exception as e:
-                            st.error(f"Groq API error for test case {idx + 1}: {e}")
-                            results["Test Case Number"].append(f"TC {idx + 1}")
-                            results["Clarity"].append("Error")
-                            results["Coverage"].append("Error")
-                            results["Overall Quality"].append("Error")
-
-                    # Merge results into the original DataFrame
-                    df_result = pd.DataFrame(results)
-                    df_merged = pd.merge(df, df_result, left_index=True, right_index=True, how="left")
-
-                    # Save the results to a new Excel file
-                    output_file = f"validated_{uploaded_file.name}"
-                    df_merged.to_excel(output_file, index=False)
-                    st.success(f"Results saved to {output_file}")
-
-                    # Allow download of the validated file
-                    with open(output_file, "rb") as f:
-                        st.download_button(
-                            label="Download Validation Results",
-                            data=f,
-                            file_name=output_file,
-                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        )
-
-            except Exception as e:
-                st.error(f"Error processing file {uploaded_file.name}: {e}")
-        
         elif test_case_type == "Test Case Generation" and content_type == "Video":
             # output_pdf_path = None
             with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -495,7 +382,7 @@ else:
                     # st.success("PRD document generated successfully!")
                 output_pdf_path = "prd_document.pdf"
                 prd_file_path = output_pdf_path
-                save_text_to_pdf(prd_document, output_pdf_path)
+                a=save_text_to_pdf(prd_document, output_pdf_path)
             # st.image(uploaded_file_path, caption="Uploaded Photo")
         
             elif content_type == "Document":
@@ -503,7 +390,7 @@ else:
                 extracted_text = read_pdf_document(uploaded_file_path)
                 if extracted_text.strip():
                     prd_document = generate_prd_from_text(extracted_text)
-                    st.success("PRD document generated successfully!")
+                    # st.success("PRD document generated successfully!")
             
             # Save the generated PRD document to PDF
                 output_pdf_path = "prd_document.pdf"
@@ -720,7 +607,6 @@ else:
         
             Please ensure that the test cases are aligned with industry standards and cover all functional and non-functional requirements, including edge cases and failure scenarios.
             and give me the result in table format
-            
            
             """
         
@@ -777,7 +663,7 @@ else:
             output_in_image = False
         elif prd_file_path.endswith('.pdf'):
             prd_text = read_pdf_document(prd_file_path)
-            st.success("PRD document pdf read successfully!")
+            # st.success("PRD document pdf read successfully!")
             # st.success("Hey im training the bert!")
             output_in_image = False
         elif prd_file_path.endswith(('.png', '.jpg', '.jpeg')):
@@ -1042,44 +928,12 @@ else:
         # st.success("refined  successfully!")
         
         # Generate test cases using the Groq API
-        # import pandas as pd
-
-# Generate test cases
         test_cases_string = generate_test_cases(prd_text, api_key)
-        st.success("TC Generated successfully!")
+        st.success("TC Generated  successfully!")
         st.write("Generated Test Cases:")
         st.write(test_cases_string)
-        
-        # # Parse test cases into a structured format (assume test cases are separated by line breaks)
-        # test_cases_list = test_cases_string.split("\n")  # Modify the split logic if the format is different
-        
-        # # Create a DataFrame for the table
-        # test_cases_df = pd.DataFrame({
-        #     "Test Case ID": [f"TC-{i+1}" for i in range(len(test_cases_list))],
-        #     "Description": test_cases_list
-        # })
-        
-        # # Display the table
-        # # st.write("Test Cases in Table Format:")
-        # st.dataframe(test_cases_df)
-        
-        # # Save the DataFrame to a CSV file
-        # output_csv_path = "generated_test_cases.csv"
-        # test_cases_df.to_csv(output_csv_path, index=False)
-        
-        # # Allow the user to download the CSV file
-        # with open(output_csv_path, "rb") as file:
-        #     test_cases_csv_data = file.read()
-        
-        # st.download_button(
-        #     label="Download",
-        #     data=test_cases_csv_data,
-        #     file_name="generated_test_cases.csv",
-        #     mime="text/csv"
-        # )
-
-    else:
-        st.info("Please select the option")
+    # else:
+    #     st.info("Please select the option")
         
 
     

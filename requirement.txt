@@ -4,9 +4,8 @@ pandas
 opencv-python
 pytesseract
 fpdf
-tempfile
 groq
-re
+opencv-python-headless
 PyPDF2
 Pillow
 pdfminer.six
@@ -16,3 +15,4 @@ torch
 transformers
 scikit-learn
 numpy
+openpyxl
